@@ -1,0 +1,231 @@
+      // // Load saved URL from localStorage on page load
+      // window.addEventListener("DOMContentLoaded", () => {
+      //   const savedUrl = localStorage.getItem("audioUrl");
+      //   if (savedUrl) {
+      //     urlInput.value = savedUrl;
+      //     audioPlayer.src = savedUrl;
+      //     audioPlayer.loop = true;
+      //   }
+      // });
+
+      // // Prompt user twice before refreshing the page
+      // let refreshAttempts = 0;
+      // window.addEventListener("beforeunload", (e) => {
+      //   if (refreshAttempts < 2) {
+      //     e.preventDefault();
+      //     e.returnValue = "";
+      //     refreshAttempts++;
+      //   }
+      // });
+
+
+    <!-- <script>
+      const urlInput = document.getElementById("urlInput");
+      const playButton = document.getElementById("playButton");
+      const audioPlayer = document.getElementById("audioPlayer");
+      const errorMessage = document.getElementById("errorMessage");
+
+      playButton.addEventListener("click", () => {
+        // Clear previous error and audio source
+        errorMessage.textContent = "";
+        audioPlayer.src = "";
+
+        // Get the URL from input
+        const audioUrl = urlInput.value.trim();
+
+        // Basic URL validation
+        if (!audioUrl) {
+          errorMessage.textContent = "Please enter a URL";
+          return;
+        }
+
+        try {
+          // Set the audio source and play
+          audioPlayer.src = audioUrl;
+
+          // Ensure loop is set
+          audioPlayer.loop = true;
+
+          // Try to play
+          audioPlayer.play().catch((error) => {
+            errorMessage.textContent = `Error playing audio: ${error.message}`;
+          });
+        } catch (error) {
+          errorMessage.textContent = `Error: ${error.message}`;
+        }
+      });
+
+      // Allow playing by pressing Enter in the input field
+      urlInput.addEventListener("keypress", (event) => {
+        if (event.key === "Enter") {
+          playButton.click();
+        }
+      });
+
+      // Additional error handling for audio element
+      audioPlayer.addEventListener("error", (e) => {
+        errorMessage.textContent =
+          "Unable to load or play the audio file. Check the URL and file access.";
+      });
+    </script> -->
+
+      /* audio::-webkit-media-controls {
+        background-color: #1e1e1e;
+      }
+      audio::-webkit-media-controls-enclosure {
+        background-color: #1e1e1e;
+      } */
+
+          // // Try to play
+          // audioPlayer.play().catch((error) => {
+          //   errorMessage.textContent = `Error playing audio: ${error.message}`;
+          // });
+
+      // playButton.addEventListener("click", () => {
+      //   // Clear previous error and audio source
+      //   errorMessage.textContent = "";
+      //   audioPlayer.src = "";
+
+      //   // Get the URL from input
+      //   const audioUrl = urlInput.value.trim();
+
+      //   // Basic URL validation
+      //   if (!audioUrl) {
+      //     errorMessage.textContent = "Please enter a URL";
+      //     return;
+      //   }
+
+      //   try {
+      //     // Save the URL to localStorage
+      //     localStorage.setItem("audioUrl", audioUrl);
+
+      //     // Set the audio source and play
+      //     audioPlayer.src = audioUrl;
+
+      //     // Ensure loop is set
+      //     audioPlayer.loop = true;
+
+      //     // Clear the saved playback time in localStorage
+      //     localStorage.removeItem("audioTime");
+      //     // When the metadata is loaded, reset the playback time and play
+      //     audioPlayer.addEventListener("loadedmetadata", () => {
+      //       audioPlayer.currentTime = 0; // Ensure it starts at 0 seconds
+      //       audioPlayer.play().catch((error) => {
+      //         errorMessage.textContent = `Error playing audio: ${error.message}`;
+      //       });
+      //     });
+      //   } catch (error) {
+      //     errorMessage.textContent = `Error: ${error.message}`;
+      //   }
+      // });
+
+
+    <!-- <script>
+      const urlInput = document.getElementById("urlInput");
+      const playButton = document.getElementById("playButton");
+      const audioPlayer = document.getElementById("audioPlayer");
+      const errorMessage = document.getElementById("errorMessage");
+      const savedUrl = localStorage.getItem("audioUrl");
+      const savedTime = localStorage.getItem("audioTime");
+
+      // Load saved URL and playback time from localStorage on page load
+      window.addEventListener("DOMContentLoaded", () => {
+        if (savedUrl) {
+          urlInput.value = savedUrl;
+          audioPlayer.src = savedUrl;
+          audioPlayer.loop = true;
+
+          // When the metadata is loaded, set the saved playback time and play
+          audioPlayer.addEventListener("loadedmetadata", () => {
+            if (savedTime) {
+              audioPlayer.currentTime = parseFloat(savedTime);
+            }
+            // window.onload = function () {
+            //   audioPlayer.play();
+            // };
+          });
+        }
+      });
+
+      // Save the current playback time in localStorage as the song plays
+      audioPlayer.addEventListener("timeupdate", () => {
+        localStorage.setItem("audioTime", audioPlayer.currentTime);
+      });
+
+      function playAudio(url) {
+        // Clear the saved playback time in localStorage
+        localStorage.removeItem("audioTime");
+
+        // Set the audio source
+        audioPlayer.src = url;
+
+        // Ensure loop is set
+        audioPlayer.loop = true;
+
+        // When the metadata is loaded, reset the playback time and play
+        audioPlayer.addEventListener("loadedmetadata", () => {
+          audioPlayer.currentTime = 0; // Ensure it starts at 0 seconds
+          audioPlayer.play().catch((error) => {
+            errorMessage.textContent = `Error playing audio: ${error.message}`;
+          });
+        });
+      }
+
+      // Example of using this function when the play button is clicked:
+      playButton.addEventListener("click", () => {
+        const audioUrl = urlInput.value.trim();
+
+        if (!audioUrl) {
+          errorMessage.textContent = "Please enter a URL";
+          return;
+        }
+
+        // Save the URL to localStorage
+        localStorage.setItem("audioUrl", audioUrl);
+
+        // Call the playAudio function
+        playAudio(audioUrl);
+      });
+
+      // Allow playing by pressing Enter or Ctrl+V in the input field
+      urlInput.addEventListener("keydown", (event) => {
+        // Check if the Enter key is pressed
+        if (event.key === "Enter") {
+          playButton.click();
+          urlInput.blur();
+        }
+
+        // Check if Ctrl+V is pressed (for pasting) after 100ms
+        if (event.ctrlKey && event.key === "v") {
+          setTimeout(() => {
+            playButton.click();
+            urlInput.blur();
+          }, 100);
+        }
+        //   console.log(`Key pressed: ${event.key}`);
+      });
+
+      // Additional error handling for audio element
+      audioPlayer.addEventListener("error", (e) => {
+        errorMessage.textContent =
+          "Unable to load or play the audio file. Check the URL and file access.";
+      });
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "/") {
+          event.preventDefault(); // Prevent the default action of the slash key
+          urlInput.focus();
+          urlInput.value = ""; // Clear the input before pasting
+        } else if (event.key === "Escape") {
+          urlInput.blur();
+          urlInput.value = savedUrl;
+        } else if (event.code === "Space") {
+          event.preventDefault(); // Prevent page from scrolling when space is pressed
+          if (audioPlayer.paused) {
+            audioPlayer.play();
+          } else {
+            audioPlayer.pause();
+          }
+        }
+      });
+    </script> -->

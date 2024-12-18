@@ -1,0 +1,708 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Directory Tree Viewer</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f5f5f5;
+      }
+
+      .container {
+        background-color: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .input-group {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+
+      input[type="text"] {
+        flex-grow: 1;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+
+      button {
+        padding: 8px 16px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background-color: #0056b3;
+      }
+
+      .tree {
+        margin-top: 20px;
+        font-family: monospace;
+      }
+
+      .tree ul {
+        list-style-type: none;
+        padding-left: 20px;
+      }
+
+      .tree li {
+        position: relative;
+        padding: 4px 0;
+      }
+
+      .tree li::before {
+        content: "├─";
+        position: absolute;
+        left: -20px;
+      }
+
+      .tree li:last-child::before {
+        content: "└─";
+      }
+
+      .folder {
+        color: #007bff;
+        cursor: pointer;
+      }
+
+      .file {
+        color: #333;
+      }
+
+      .error {
+        color: #dc3545;
+        margin-top: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Directory Tree Viewer</h1>
+      <div class="input-group">
+        <input
+          type="text"
+          id="pathInput"
+          placeholder="Enter folder path (e.g., C:\Users\YourName\Documents)"
+        />
+        <button onclick="generateTree()">Generate Tree</button>
+      </div>
+      <div id="treeOutput" class="tree"></div>
+    </div>
+
+    <script>
+      async function generateTree() {
+        const pathInput = document.getElementById("pathInput");
+        const treeOutput = document.getElementById("treeOutput");
+        const path = pathInput.value.trim();
+
+        if (!path) {
+          treeOutput.innerHTML =
+            '<div class="error">Please enter a valid path</div>';
+          return;
+        }
+
+        try {
+          const tree = await traverseDirectory(path);
+          displayTree(tree, treeOutput);
+        } catch (error) {
+          treeOutput.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+        }
+      }
+
+      async function traverseDirectory(path) {
+        try {
+          const entries = await window.fs.readdir(path);
+          const tree = [];
+
+          for (const entry of entries) {
+            const fullPath = `${path}/${entry}`;
+            const stats = await window.fs.stat(fullPath);
+
+            if (stats.isDirectory()) {
+              const children = await traverseDirectory(fullPath);
+              tree.push({ name: entry, type: "folder", children });
+            } else {
+              tree.push({ name: entry, type: "file" });
+            }
+          }
+
+          return tree.sort((a, b) => {
+            if (a.type === b.type) {
+              return a.name.localeCompare(b.name);
+            }
+            return a.type === "folder" ? -1 : 1;
+          });
+        } catch (error) {
+          throw new Error(`Failed to read directory: ${error.message}`);
+        }
+      }
+
+      function displayTree(tree, container) {
+        const ul = document.createElement("ul");
+
+        tree.forEach((item) => {
+          const li = document.createElement("li");
+          const span = document.createElement("span");
+          span.textContent = item.name;
+          span.className = item.type;
+
+          if (item.type === "folder") {
+            span.addEventListener("click", () => {
+              const childUl = li.querySelector("ul");
+              if (childUl) {
+                childUl.style.display =
+                  childUl.style.display === "none" ? "block" : "none";
+              }
+            });
+
+            li.appendChild(span);
+            if (item.children && item.children.length > 0) {
+              displayTree(item.children, li);
+            }
+          } else {
+            li.appendChild(span);
+          }
+
+          ul.appendChild(li);
+        });
+
+        container.innerHTML = "";
+        container.appendChild(ul);
+      }
+    </script>
+  </body>
+</html> -->
+
+<!--
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Directory Tree Viewer</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f5f5f5;
+      }
+
+      .container {
+        background-color: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .input-group {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+        flex-direction: column;
+      }
+
+      .input-description {
+        color: #666;
+        margin-bottom: 10px;
+      }
+
+      button {
+        padding: 8px 16px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        max-width: 200px;
+      }
+
+      button:hover {
+        background-color: #0056b3;
+      }
+
+      .tree {
+        margin-top: 20px;
+        font-family: monospace;
+      }
+
+      .tree ul {
+        list-style-type: none;
+        padding-left: 20px;
+        margin: 0;
+      }
+
+      .tree li {
+        position: relative;
+        padding: 4px 0;
+      }
+
+      .tree li::before {
+        content: "├─";
+        position: absolute;
+        left: -20px;
+      }
+
+      .tree li:last-child::before {
+        content: "└─";
+      }
+
+      .folder {
+        color: #007bff;
+        cursor: pointer;
+        user-select: none;
+      }
+
+      .file {
+        color: #333;
+      }
+
+      .error {
+        color: #dc3545;
+        margin-top: 10px;
+      }
+
+      .folder::before {
+        content: "📁 ";
+      }
+
+      .file::before {
+        content: "📄 ";
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Directory Tree Viewer</h1>
+      <div class="input-group">
+        <p class="input-description">
+          Select a folder to view its directory structure:
+        </p>
+        <input
+          type="file"
+          id="directoryInput"
+          webkitdirectory
+          directory
+          multiple
+        />
+      </div>
+      <div id="treeOutput" class="tree"></div>
+    </div>
+
+    <script>
+      class TreeNode {
+        constructor(name, isDirectory = false) {
+          this.name = name;
+          this.isDirectory = isDirectory;
+          this.children = [];
+        }
+      }
+
+      function buildFileTree(files) {
+        const root = new TreeNode("root", true);
+
+        for (const file of files) {
+          const pathParts = file.webkitRelativePath.split("/");
+          let currentNode = root;
+
+          // Skip the first part as it's the root directory name
+          for (let i = 1; i < pathParts.length; i++) {
+            const part = pathParts[i];
+            const isLast = i === pathParts.length - 1;
+            let child = currentNode.children.find((c) => c.name === part);
+
+            if (!child) {
+              child = new TreeNode(part, !isLast);
+              currentNode.children.push(child);
+            }
+
+            currentNode = child;
+          }
+        }
+
+        // Sort each level - directories first, then files alphabetically
+        const sortTree = (node) => {
+          node.children.sort((a, b) => {
+            if (a.isDirectory === b.isDirectory) {
+              return a.name.localeCompare(b.name);
+            }
+            return b.isDirectory ? 1 : -1;
+          });
+
+          node.children.forEach((child) => {
+            if (child.isDirectory) {
+              sortTree(child);
+            }
+          });
+        };
+
+        sortTree(root);
+        return root;
+      }
+
+      function displayTree(node, container, isRoot = true) {
+        if (isRoot && node.children.length === 0) {
+          container.innerHTML = '<div class="error">No files selected</div>';
+          return;
+        }
+
+        const ul = document.createElement("ul");
+
+        // If it's the root, we only want to display its children
+        const nodesToDisplay = isRoot ? node.children : [node];
+
+        nodesToDisplay.forEach((item) => {
+          const li = document.createElement("li");
+          const span = document.createElement("span");
+          span.textContent = item.name;
+          span.className = item.isDirectory ? "folder" : "file";
+
+          if (item.isDirectory) {
+            span.addEventListener("click", () => {
+              const childUl = li.querySelector("ul");
+              if (childUl) {
+                childUl.style.display =
+                  childUl.style.display === "none" ? "block" : "none";
+              }
+            });
+
+            li.appendChild(span);
+            if (item.children && item.children.length > 0) {
+              displayTree(item, li, false);
+            }
+          } else {
+            li.appendChild(span);
+          }
+
+          ul.appendChild(li);
+        });
+
+        if (isRoot) {
+          container.innerHTML = "";
+          container.appendChild(ul);
+        } else {
+          container.appendChild(ul);
+        }
+      }
+
+      document
+        .getElementById("directoryInput")
+        .addEventListener("change", (event) => {
+          const files = event.target.files;
+          if (files.length > 0) {
+            const tree = buildFileTree(files);
+            displayTree(tree, document.getElementById("treeOutput"));
+          }
+        });
+    </script>
+  </body>
+</html>
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Directory Tree Viewer</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f5f5f5;
+      }
+
+      .container {
+        background-color: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .input-group {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+        flex-direction: column;
+      }
+
+      .input-description {
+        color: #666;
+        margin-bottom: 10px;
+      }
+
+      .stats {
+        color: #666;
+        margin-top: 10px;
+        font-size: 0.9em;
+      }
+
+      .tree {
+        margin-top: 20px;
+        font-family: monospace;
+      }
+
+      .tree-item {
+        padding: 2px 0;
+        white-space: nowrap;
+      }
+
+      .tree-content {
+        display: inline-block;
+        cursor: pointer;
+        user-select: none;
+      }
+
+      .tree-item .indent {
+        display: inline-block;
+        width: 20px;
+      }
+
+      .folder {
+        color: #007bff;
+      }
+
+      .file {
+        color: #333;
+        cursor: default;
+      }
+
+      .error {
+        color: #dc3545;
+        margin-top: 10px;
+      }
+
+      .toggle {
+        display: inline-block;
+        width: 20px;
+        text-align: center;
+      }
+
+      .folder-icon::before {
+        content: "📁";
+        margin-right: 5px;
+      }
+
+      .file-icon::before {
+        content: "📄";
+        margin-right: 5px;
+      }
+
+      .loading {
+        color: #666;
+        margin-top: 10px;
+        font-style: italic;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Directory Tree Viewer</h1>
+      <div class="input-group">
+        <p class="input-description">
+          Select a folder to view its directory structure:
+        </p>
+        <input
+          type="file"
+          id="directoryInput"
+          webkitdirectory
+          directory
+          multiple
+        />
+      </div>
+      <div id="stats" class="stats"></div>
+      <div id="treeOutput" class="tree"></div>
+    </div>
+
+    <script>
+      class TreeNode {
+        constructor(name, isDirectory = false, level = 0) {
+          this.name = name;
+          this.isDirectory = isDirectory;
+          this.children = [];
+          this.level = level;
+          this.id = Math.random().toString(36).substr(2, 9);
+          this.expanded = true;
+        }
+      }
+
+      function buildFileTree(files) {
+        const root = new TreeNode("root", true);
+
+        for (const file of files) {
+          const pathParts = file.webkitRelativePath.split("/");
+          let currentNode = root;
+          let currentLevel = 0;
+
+          for (let i = 1; i < pathParts.length; i++) {
+            const part = pathParts[i];
+            const isLast = i === pathParts.length - 1;
+            let child = currentNode.children.find((c) => c.name === part);
+
+            if (!child) {
+              child = new TreeNode(part, !isLast, currentLevel + 1);
+              currentNode.children.push(child);
+            }
+
+            currentNode = child;
+            currentLevel++;
+          }
+        }
+
+        // Sort each level - directories first, then files alphabetically
+        const sortTree = (node) => {
+          node.children.sort((a, b) => {
+            if (a.isDirectory === b.isDirectory) {
+              return a.name.localeCompare(b.name);
+            }
+            return b.isDirectory ? 1 : -1;
+          });
+
+          node.children.forEach((child) => {
+            if (child.isDirectory) {
+              sortTree(child);
+            }
+          });
+        };
+
+        sortTree(root);
+        return root;
+      }
+
+      function renderTree(root) {
+        const container = document.getElementById("treeOutput");
+        container.innerHTML = "";
+
+        function isNodeVisible(node) {
+          let current = node;
+          const parentChain = [];
+          while (current && current.level > 0) {
+            parentChain.push(current);
+            current = findParentNode(root, current);
+          }
+          return parentChain.every((n) => n.expanded);
+        }
+
+        function findParentNode(root, targetNode) {
+          const stack = [root];
+          while (stack.length) {
+            const current = stack.pop();
+            if (current.children.includes(targetNode)) {
+              return current;
+            }
+            stack.push(...current.children);
+          }
+          return null;
+        }
+
+        function flattenTree(node, visible = true) {
+          const result = [];
+          const stack = [[node, visible]];
+
+          while (stack.length > 0) {
+            const [current, isVisible] = stack.pop();
+
+            if (current !== root) {
+              if (isVisible) {
+                result.push(current);
+              }
+            }
+
+            if (current.isDirectory && current.expanded) {
+              // Add children in reverse order for correct stack processing
+              for (let i = current.children.length - 1; i >= 0; i--) {
+                stack.push([
+                  current.children[i],
+                  isVisible && current.expanded,
+                ]);
+              }
+            }
+          }
+
+          return result;
+        }
+
+        function toggleNode(nodeId) {
+          const findNode = (node) => {
+            if (node.id === nodeId) return node;
+            for (const child of node.children) {
+              const found = findNode(child);
+              if (found) return found;
+            }
+            return null;
+          };
+
+          const node = findNode(root);
+          if (node && node.isDirectory) {
+            node.expanded = !node.expanded;
+            renderTree(root);
+          }
+        }
+
+        const visibleNodes = flattenTree(root);
+
+        visibleNodes.forEach((node) => {
+          const div = document.createElement("div");
+          div.className = "tree-item";
+
+          // Create indentation
+          const indentation = "".padStart(node.level * 4, " ");
+
+          // Create toggle button or spacer
+          const toggle = node.isDirectory ? (node.expanded ? "▼" : "▶") : " ";
+
+          // Create the content
+          div.innerHTML = `
+                    <span class="indent">${indentation}</span>
+                    <span class="toggle">${toggle}</span>
+                    <span class="tree-content ${
+                      node.isDirectory ? "folder folder-icon" : "file file-icon"
+                    }"
+                          data-id="${node.id}">
+                        ${node.name}
+                    </span>`;
+
+          if (node.isDirectory) {
+            div.querySelector(".tree-content").addEventListener("click", () => {
+              toggleNode(node.id);
+            });
+          }
+
+          container.appendChild(div);
+        });
+      }
+
+      document
+        .getElementById("directoryInput")
+        .addEventListener("change", async (event) => {
+          const files = Array.from(event.target.files);
+          document.getElementById(
+            "stats"
+          ).textContent = `Processing ${files.length} files...`;
+
+          // Use setTimeout to allow the UI to update
+          setTimeout(() => {
+            const tree = buildFileTree(files);
+            renderTree(tree);
+            document.getElementById(
+              "stats"
+            ).textContent = `Total files: ${files.length}`;
+          }, 0);
+        });
+    </script>
+  </body>
+</html>
