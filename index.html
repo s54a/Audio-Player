@@ -9,7 +9,7 @@
       type="image/x-icon"
     />
     <title>Audio Loop Player</title>
-    <style>
+    <!-- <style>
       body {
         font-family: Arial, sans-serif;
         max-width: 600px;
@@ -67,14 +67,140 @@
         background-color: #999;
         border-radius: 10px;
       }
+    </style> -->
+    <style>
+      :root {
+        --background-color: #f0f0f0;
+        --text-color: #121212;
+        --input-background: #ffffff;
+        --input-border: #ccc;
+        --button-background: #007fff;
+        --button-hover: #198cff;
+        --audio-controls-bg: #ccc;
+      }
+
+      html::-webkit-scrollbar {
+        width: 0;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --background-color: #121212;
+          --text-color: #e0e0e0;
+          --input-background: #1e1e1e;
+          --input-border: #333;
+          --button-background: #007fff;
+          --button-hover: #198cff;
+          --audio-controls-bg: #999;
+        }
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        text-align: center;
+        background-color: var(--background-color);
+        color: var(--text-color);
+        background: #00d2ff; /* fallback for old browsers */
+        background: -webkit-linear-gradient(
+          to right,
+          #3a7bd5,
+          #00d2ff
+        ); /* Chrome 10-25, Safari 5.1-6 */
+        background: linear-gradient(
+          to right,
+          #3a7bd5,
+          #00d2ff
+        ); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+      }
+
+      @media (prefers-color-scheme: dark) {
+        body {
+          background: #000428; /* fallback for old browsers */
+          background: -webkit-linear-gradient(
+            to right,
+            #004e92,
+            #000428
+          ); /* Chrome 10-25, Safari 5.1-6 */
+          background: linear-gradient(
+            to right,
+            #004e92,
+            #000428
+          ); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+        }
+      }
+
+      #urlInput {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        margin-bottom: 20px;
+        height: 54px;
+        box-sizing: border-box;
+        background-color: var(--input-background);
+        border: 1px solid var(--input-border);
+        color: var(--text-color);
+        border-radius: 10px;
+        outline: 0;
+        border: 0;
+        font-size: 1rem;
+      }
+
+      #playButton {
+        padding: 10px 20px;
+        background-color: var(--button-background);
+        color: white;
+        border: none;
+        cursor: pointer;
+        margin: 10px 0;
+        transition: background-color 0.3s ease;
+        border-radius: 10px;
+        display: none;
+      }
+
+      #playButton:hover {
+        background-color: var(--button-hover);
+      }
+
+      #audioPlayer {
+        margin-top: 20px;
+        width: 100%;
+      }
+
+      #errorMessage {
+        color: #ff6b6b;
+        margin-top: 10px;
+        display: none;
+      }
+
+      h1 {
+        color: var(--text-color);
+      }
+
+      audio::-webkit-media-controls-enclosure {
+        background-color: var(--audio-controls-bg);
+        border-radius: 10px;
+      }
+
+      .container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+      }
     </style>
   </head>
   <body>
-    <h1>Audio Loop Player</h1>
-    <input type="text" id="urlInput" placeholder="Enter audio file URL" />
-    <button id="playButton">Play</button>
-    <div id="errorMessage"></div>
-    <audio id="audioPlayer" controls loop autoplay></audio>
+    <!-- <h1>Audio Loop Player</h1> -->
+    <div class="container">
+      <input type="text" id="urlInput" placeholder="Enter audio file URL" />
+      <button id="playButton">Play</button>
+      <div id="errorMessage"></div>
+      <audio id="audioPlayer" controls loop autoplay></audio>
+    </div>
 
     <script>
       const urlInput = document.getElementById("urlInput");
