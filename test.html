@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Quick Paste Input</title>
+  </head>
+  <body>
+    <input type="text" id="searchInput" placeholder="Press / to search..." />
+
+    <script>
+      const searchInput = document.getElementById("searchInput");
+
+      document.addEventListener("keydown", function (e) {
+        // Check if the pressed key is '/' and we're not already focused on the input
+        if (e.key === "/" && document.activeElement !== searchInput) {
+          e.preventDefault(); // Prevent the '/' from being typed
+          searchInput.focus();
+          console.log(e);
+          console.log(e.clipboardData);
+
+          // Get clipboard data from the keyboard event
+          if (e.clipboardData) {
+            console.log(e);
+            const text = e.clipboardData.getData("text");
+            searchInput.value = text;
+            console.log(text);
+          }
+        }
+      });
+    </script>
+  </body>
+</html>

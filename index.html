@@ -1,5 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
+  <!-- Maybe Create an npm package which then give a command to run a server  -->
+  <!-- Or a bash function which cds into the directory and runs the server -->
+  <!-- Then on a custom port localhost it run the website which now has the clipboard access -->
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,66 +11,7 @@
       href="https://www.svgrepo.com/show/268463/music-player-music.svg"
       type="image/x-icon"
     />
-    <title>Audio Loop Player</title>
-    <!-- <style>
-      body {
-        font-family: Arial, sans-serif;
-        max-width: 600px;
-        margin: 0 auto;
-        padding: 20px;
-        text-align: center;
-        background-color: #121212;
-        color: #e0e0e0;
-      }
-      #urlInput {
-        width: 100%;
-        padding: 10px;
-        margin: 10px 0;
-        margin-bottom: 20px;
-        height: 54px;
-        box-sizing: border-box;
-        background-color: #1e1e1e;
-        border: 1px solid #333;
-        color: #e0e0e0;
-        border-radius: 10px;
-      }
-      #playButton {
-        padding: 10px 20px;
-        background-color: #007fff;
-        color: white;
-        border: none;
-        cursor: pointer;
-        margin: 10px 0;
-        transition: background-color 0.3s ease;
-        border-radius: 10px;
-        display: none;
-      }
-      #playButton:hover {
-        /* background-color: lighten(#007fff, 50%); */
-        background-color: #198cff;
-      }
-      #audioPlayer {
-        margin-top: 20px;
-        width: 100%;
-      }
-      #errorMessage {
-        color: #ff6b6b;
-        margin-top: 10px;
-        display: none;
-      }
-      h1 {
-        color: #e0e0e0;
-      }
-      /* audio::-webkit-media-controls { */
-      /* background-color: #1e1e1e; */
-      /* border-radius: 10px; */
-      /* } */
-
-      audio::-webkit-media-controls-enclosure {
-        background-color: #999;
-        border-radius: 10px;
-      }
-    </style> -->
+    <title>Player</title>
     <style>
       :root {
         --background-color: #f0f0f0;
@@ -83,7 +27,7 @@
         width: 0;
       }
 
-      @media (prefers-color-scheme: dark) {
+      /* @media (prefers-color-scheme: dark) {
         :root {
           --background-color: #121212;
           --text-color: #e0e0e0;
@@ -93,7 +37,7 @@
           --button-hover: #198cff;
           --audio-controls-bg: #999;
         }
-      }
+      } */
 
       body {
         font-family: Arial, sans-serif;
@@ -101,35 +45,14 @@
         margin: 0 auto;
         padding: 20px;
         text-align: center;
-        background-color: var(--background-color);
-        color: var(--text-color);
-        background: #00d2ff; /* fallback for old browsers */
+        background: #020106;
         background: -webkit-linear-gradient(
           to right,
-          #3a7bd5,
-          #00d2ff
-        ); /* Chrome 10-25, Safari 5.1-6 */
-        background: linear-gradient(
-          to right,
-          #3a7bd5,
-          #00d2ff
-        ); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
-      }
-
-      @media (prefers-color-scheme: dark) {
-        body {
-          background: #000428; /* fallback for old browsers */
-          background: -webkit-linear-gradient(
-            to right,
-            #004e92,
-            #000428
-          ); /* Chrome 10-25, Safari 5.1-6 */
-          background: linear-gradient(
-            to right,
-            #004e92,
-            #000428
-          ); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
-        }
+          #070712,
+          #0d0d1a,
+          #020106
+        );
+        background: linear-gradient(to right, #070712, #0d0d1a, #020106);
       }
 
       #urlInput {
@@ -190,6 +113,7 @@
         align-items: center;
         justify-content: center;
         height: 100vh;
+        margin-top: -10rem;
       }
     </style>
   </head>
@@ -346,7 +270,7 @@
           "Unable to load or play the audio file. Check the URL and file access.";
       });
 
-      // Keyboard shortcuts
+      // // Keyboard shortcuts
       document.addEventListener("keydown", (event) => {
         if (event.key === "/") {
           event.preventDefault();
@@ -364,6 +288,19 @@
             fadeOut(() => audioPlayer.pause());
           }
         }
+      });
+
+      document.addEventListener("paste", function (e) {
+        // This will work when user manually pastes
+        const text = e.clipboardData.getData("text");
+        e.preventDefault();
+        urlInput.focus();
+        urlInput.value = "";
+        urlInput.value = text;
+        setTimeout(() => {
+          playButton.click();
+          urlInput.blur();
+        }, 10);
       });
     </script>
   </body>

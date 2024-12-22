@@ -229,3 +229,68 @@
         }
       });
     </script> -->
+
+
+      /* @media (prefers-color-scheme: dark) { */
+      /* body {
+          background: #000428;
+          background: -webkit-linear-gradient(
+            to right,
+            #004e92,
+            #000428
+          );
+          background: linear-gradient(
+            to right,
+            #004e92,
+            #000428
+          );
+        } */
+      /* body { */
+      /* background: #0f0c29;
+          background: -webkit-linear-gradient(
+            to right,
+            #24243e,
+            #302b63,
+            #0f0c29
+          );
+          background: linear-gradient(to right, #24243e, #302b63, #0f0c29); */
+      /* background: #0a081e;
+          background: -webkit-linear-gradient(
+            to right,
+            #1a1a3a,
+            #282252,
+            #0a081e
+          );
+          background: linear-gradient(to right, #1a1a3a, #282252, #0a081e); */
+      /* background: #050410;
+          background: -webkit-linear-gradient(
+            to right,
+            #0d0d20,
+            #1a1630,
+            #050410
+          );
+          background: linear-gradient(to right, #0d0d20, #1a1630, #050410); */
+      /* background: #020106;
+          background: -webkit-linear-gradient(
+            to right,
+            #070712,
+            #0d0d1a,
+            #020106
+          );
+          background: linear-gradient(to right, #070712, #0d0d1a, #020106);
+        }
+      } */
+
+        /* background-color: var(--background-color); */
+        /* color: var(--text-color); */
+        /* background: #00d2ff;
+        background: -webkit-linear-gradient(
+          to right,
+          #3a7bd5,
+          #00d2ff
+        );
+        background: linear-gradient(
+          to right,
+          #3a7bd5,
+          #00d2ff
+        );  */
