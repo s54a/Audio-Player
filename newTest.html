@@ -1,0 +1,772 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MP3 Player</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        background: #f0f2f5;
+      }
+
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+
+      .upload-section {
+        border: 2px dashed #ccc;
+        padding: 20px;
+        text-align: center;
+        margin-bottom: 20px;
+        border-radius: 5px;
+        background: #fafafa;
+      }
+
+      .upload-section.dragover {
+        border-color: #4caf50;
+        background: #e8f5e9;
+      }
+
+      .playlist {
+        margin: 20px 0;
+        max-height: 300px;
+        overflow-y: auto;
+      }
+
+      .track {
+        display: flex;
+        align-items: center;
+        padding: 10px;
+        border: 1px solid #eee;
+        margin: 5px 0;
+        cursor: pointer;
+        transition: background 0.3s;
+        border-radius: 5px;
+      }
+
+      .track:hover {
+        background: #f5f5f5;
+      }
+
+      .track.playing {
+        background: #e3f2fd;
+        border-color: #2196f3;
+      }
+
+      .player-controls {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 20px;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 5px;
+      }
+
+      .player-controls button {
+        padding: 8px 15px;
+        border: none;
+        border-radius: 5px;
+        background: #2196f3;
+        color: white;
+        cursor: pointer;
+        transition: background 0.3s;
+      }
+
+      .player-controls button:hover {
+        background: #1976d2;
+      }
+
+      .player-controls button:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+      }
+
+      #progress-bar {
+        flex-grow: 1;
+        height: 5px;
+        background: #ddd;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      #progress {
+        width: 0%;
+        height: 100%;
+        background: #2196f3;
+        border-radius: 5px;
+        transition: width 0.1s linear;
+      }
+
+      .volume-control {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+
+      #volume {
+        width: 100px;
+      }
+
+      .now-playing {
+        margin-top: 10px;
+        text-align: center;
+        font-size: 0.9em;
+        color: #666;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="upload-section" id="upload-zone">
+        <input
+          type="file"
+          id="folder-input"
+          webkitdirectory
+          directory
+          multiple
+          style="display: none"
+        />
+        <label for="folder-input"
+          >Drop your music folder here or click to select</label
+        >
+      </div>
+
+      <div class="playlist" id="playlist"></div>
+
+      <div class="now-playing" id="now-playing"></div>
+
+      <div class="player-controls">
+        <button id="prev">Previous</button>
+        <button id="play-pause">Play</button>
+        <button id="next">Next</button>
+        <div id="progress-bar">
+          <div id="progress"></div>
+        </div>
+        <div class="volume-control">
+          <span>Volume:</span>
+          <input
+            type="range"
+            id="volume"
+            min="0"
+            max="1"
+            step="0.1"
+            value="1"
+          />
+        </div>
+      </div>
+
+      <audio id="audio-player"></audio>
+    </div>
+
+    <script>
+      // Store references to DOM elements
+      const uploadZone = document.getElementById("upload-zone");
+      const folderInput = document.getElementById("folder-input");
+      const playlist = document.getElementById("playlist");
+      const audioPlayer = document.getElementById("audio-player");
+      const playPauseBtn = document.getElementById("play-pause");
+      const prevBtn = document.getElementById("prev");
+      const nextBtn = document.getElementById("next");
+      const progressBar = document.getElementById("progress-bar");
+      const progress = document.getElementById("progress");
+      const volumeControl = document.getElementById("volume");
+      const nowPlayingText = document.getElementById("now-playing");
+
+      let tracks = [];
+      let currentTrackIndex = 0;
+
+      // Load tracks from localStorage if available
+      const savedTracks = localStorage.getItem("mp3Tracks");
+      if (savedTracks) {
+        tracks = JSON.parse(savedTracks);
+        renderPlaylist();
+      }
+
+      // Handle file upload
+      folderInput.addEventListener("change", handleFiles);
+      uploadZone.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        uploadZone.classList.add("dragover");
+      });
+      uploadZone.addEventListener("dragleave", () => {
+        uploadZone.classList.remove("dragover");
+      });
+      uploadZone.addEventListener("drop", (e) => {
+        e.preventDefault();
+        uploadZone.classList.remove("dragover");
+        handleFiles({ target: { files: e.dataTransfer.files } });
+      });
+
+      function handleFiles(event) {
+        const files = Array.from(event.target.files).filter((file) =>
+          file.type.includes("audio")
+        );
+
+        tracks = files.map((file) => ({
+          name: file.name,
+          path: URL.createObjectURL(file),
+        }));
+
+        // Save to localStorage (only the names, not the blob URLs)
+        localStorage.setItem("mp3Tracks", JSON.stringify(tracks));
+
+        renderPlaylist();
+      }
+
+      function renderPlaylist() {
+        playlist.innerHTML = "";
+        tracks.forEach((track, index) => {
+          const trackElement = document.createElement("div");
+          trackElement.className =
+            "track" + (index === currentTrackIndex ? " playing" : "");
+          trackElement.textContent = track.name;
+          trackElement.addEventListener("click", () => playTrack(index));
+          playlist.appendChild(trackElement);
+        });
+      }
+
+      function playTrack(index) {
+        if (index >= 0 && index < tracks.length) {
+          currentTrackIndex = index;
+          audioPlayer.src = tracks[index].path;
+          audioPlayer.play();
+          playPauseBtn.textContent = "Pause";
+          nowPlayingText.textContent = `Now playing: ${tracks[index].name}`;
+          renderPlaylist();
+        }
+      }
+
+      // Player controls
+      playPauseBtn.addEventListener("click", () => {
+        if (audioPlayer.paused) {
+          if (!audioPlayer.src) {
+            playTrack(0);
+          } else {
+            audioPlayer.play();
+          }
+          playPauseBtn.textContent = "Pause";
+        } else {
+          audioPlayer.pause();
+          playPauseBtn.textContent = "Play";
+        }
+      });
+
+      prevBtn.addEventListener("click", () => {
+        playTrack(currentTrackIndex - 1);
+      });
+
+      nextBtn.addEventListener("click", () => {
+        playTrack(currentTrackIndex + 1);
+      });
+
+      // Progress bar
+      audioPlayer.addEventListener("timeupdate", () => {
+        const percentage =
+          (audioPlayer.currentTime / audioPlayer.duration) * 100;
+        progress.style.width = percentage + "%";
+      });
+
+      progressBar.addEventListener("click", (e) => {
+        const rect = progressBar.getBoundingClientRect();
+        const percentage = (e.clientX - rect.left) / rect.width;
+        audioPlayer.currentTime = percentage * audioPlayer.duration;
+      });
+
+      // Volume control
+      volumeControl.addEventListener("input", (e) => {
+        audioPlayer.volume = e.target.value;
+      });
+
+      // Auto-play next track
+      audioPlayer.addEventListener("ended", () => {
+        playTrack(currentTrackIndex + 1);
+      });
+
+      // Keyboard controls
+      document.addEventListener("keydown", (e) => {
+        if (e.code === "Space") {
+          e.preventDefault();
+          playPauseBtn.click();
+        } else if (e.code === "ArrowLeft") {
+          prevBtn.click();
+        } else if (e.code === "ArrowRight") {
+          nextBtn.click();
+        }
+      });
+    </script>
+  </body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MP3 Player with Folder Structure</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        background: #f0f2f5;
+      }
+
+      .container {
+        max-width: 1000px;
+        margin: 0 auto;
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+
+      .upload-section {
+        border: 2px dashed #ccc;
+        padding: 20px;
+        text-align: center;
+        margin-bottom: 20px;
+        border-radius: 5px;
+        background: #fafafa;
+      }
+
+      .upload-section.dragover {
+        border-color: #4caf50;
+        background: #e8f5e9;
+      }
+
+      .search-box {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 14px;
+      }
+
+      .folder-structure {
+        margin: 20px 0;
+        max-height: 400px;
+        overflow-y: auto;
+        border: 1px solid #eee;
+        border-radius: 5px;
+        padding: 10px;
+      }
+
+      .folder,
+      .file {
+        padding: 5px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        border-radius: 4px;
+      }
+
+      .folder:hover,
+      .file:hover {
+        background: #f5f5f5;
+      }
+
+      .folder.playing,
+      .file.playing {
+        background: #e3f2fd;
+      }
+
+      .folder-content {
+        margin-left: 20px;
+        display: none;
+      }
+
+      .folder-content.open {
+        display: block;
+      }
+
+      .folder i,
+      .file i {
+        margin-right: 8px;
+        width: 20px;
+        text-align: center;
+      }
+
+      .player-controls {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 20px;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 5px;
+      }
+
+      .player-controls button {
+        padding: 8px 15px;
+        border: none;
+        border-radius: 5px;
+        background: #2196f3;
+        color: white;
+        cursor: pointer;
+        transition: background 0.3s;
+      }
+
+      .player-controls button:hover {
+        background: #1976d2;
+      }
+
+      .player-controls button:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+      }
+
+      #progress-bar {
+        flex-grow: 1;
+        height: 5px;
+        background: #ddd;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      #progress {
+        width: 0%;
+        height: 100%;
+        background: #2196f3;
+        border-radius: 5px;
+      }
+
+      .volume-control {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+
+      #volume {
+        width: 100px;
+      }
+
+      .now-playing {
+        margin-top: 10px;
+        text-align: center;
+        font-size: 0.9em;
+        color: #666;
+      }
+
+      .hidden {
+        display: none !important;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="upload-section" id="upload-zone">
+        <input
+          type="file"
+          id="folder-input"
+          webkitdirectory
+          directory
+          multiple
+          style="display: none"
+        />
+        <label for="folder-input"
+          >Drop your music folder here or click to select</label
+        >
+      </div>
+
+      <input
+        type="text"
+        class="search-box"
+        id="search"
+        placeholder="Search for songs..."
+      />
+
+      <div class="folder-structure" id="folder-structure"></div>
+
+      <div class="now-playing" id="now-playing"></div>
+
+      <div class="player-controls">
+        <button id="prev">Previous</button>
+        <button id="play-pause">Play</button>
+        <button id="next">Next</button>
+        <div id="progress-bar">
+          <div id="progress"></div>
+        </div>
+        <div class="volume-control">
+          <span>Volume:</span>
+          <input
+            type="range"
+            id="volume"
+            min="0"
+            max="1"
+            step="0.1"
+            value="1"
+          />
+        </div>
+      </div>
+
+      <audio id="audio-player"></audio>
+    </div>
+
+    <script>
+      const uploadZone = document.getElementById("upload-zone");
+      const folderInput = document.getElementById("folder-input");
+      const folderStructure = document.getElementById("folder-structure");
+      const audioPlayer = document.getElementById("audio-player");
+      const playPauseBtn = document.getElementById("play-pause");
+      const prevBtn = document.getElementById("prev");
+      const nextBtn = document.getElementById("next");
+      const progressBar = document.getElementById("progress-bar");
+      const progress = document.getElementById("progress");
+      const volumeControl = document.getElementById("volume");
+      const nowPlayingText = document.getElementById("now-playing");
+      const searchInput = document.getElementById("search");
+
+      let fileStructure = {};
+      let allTracks = [];
+      let currentTrackIndex = 0;
+
+      // Load saved structure from localStorage
+      const savedStructure = localStorage.getItem("mp3Structure");
+      const savedTracks = localStorage.getItem("mp3Tracks");
+      if (savedStructure && savedTracks) {
+        fileStructure = JSON.parse(savedStructure);
+        allTracks = JSON.parse(savedTracks);
+        renderFolderStructure();
+      }
+
+      function handleFiles(event) {
+        const files = Array.from(event.target.files).filter((file) =>
+          file.type.includes("audio")
+        );
+        fileStructure = {};
+        allTracks = [];
+
+        files.forEach((file) => {
+          const pathParts = file.webkitRelativePath.split("/");
+          let current = fileStructure;
+
+          // Build folder structure
+          for (let i = 0; i < pathParts.length - 1; i++) {
+            const part = pathParts[i];
+            if (!current[part]) {
+              current[part] = {};
+            }
+            current = current[part];
+          }
+
+          // Add file
+          const fileName = pathParts[pathParts.length - 1];
+          current[fileName] = {
+            type: "file",
+            path: URL.createObjectURL(file),
+            fullPath: file.webkitRelativePath,
+          };
+
+          allTracks.push({
+            name: fileName,
+            path: URL.createObjectURL(file),
+            fullPath: file.webkitRelativePath,
+          });
+        });
+
+        localStorage.setItem("mp3Structure", JSON.stringify(fileStructure));
+        localStorage.setItem("mp3Tracks", JSON.stringify(allTracks));
+
+        renderFolderStructure();
+      }
+
+      function renderFolderStructure(searchTerm = "") {
+        folderStructure.innerHTML = "";
+        renderFolder(fileStructure, folderStructure, "", searchTerm);
+      }
+
+      function renderFolder(folder, parentElement, path, searchTerm) {
+        Object.entries(folder).forEach(([name, content]) => {
+          const fullPath = path ? `${path}/${name}` : name;
+
+          if (content.type === "file") {
+            if (
+              !searchTerm ||
+              name.toLowerCase().includes(searchTerm.toLowerCase())
+            ) {
+              const fileDiv = document.createElement("div");
+              fileDiv.className = "file";
+              fileDiv.innerHTML = `
+                            <i class="fas fa-music"></i>
+                            <span>${name}</span>
+                        `;
+              fileDiv.addEventListener("click", () =>
+                playFile(content.path, name, fullPath)
+              );
+              parentElement.appendChild(fileDiv);
+            }
+          } else {
+            const folderDiv = document.createElement("div");
+            folderDiv.className = "folder";
+            folderDiv.innerHTML = `
+                        <i class="fas fa-folder"></i>
+                        <span>${name}</span>
+                    `;
+
+            const folderContent = document.createElement("div");
+            folderContent.className = "folder-content";
+
+            renderFolder(content, folderContent, fullPath, searchTerm);
+
+            // Only show folders that have matching files when searching
+            if (!searchTerm || folderContent.children.length > 0) {
+              parentElement.appendChild(folderDiv);
+              parentElement.appendChild(folderContent);
+
+              folderDiv.addEventListener("click", (e) => {
+                e.stopPropagation();
+                folderContent.classList.toggle("open");
+                folderDiv.querySelector("i").classList.toggle("fa-folder");
+                folderDiv.querySelector("i").classList.toggle("fa-folder-open");
+              });
+            }
+          }
+        });
+      }
+
+      function playFile(path, name, fullPath) {
+        audioPlayer.src = path;
+        audioPlayer.play();
+        playPauseBtn.textContent = "Pause";
+        nowPlayingText.textContent = `Now playing: ${name}`;
+
+        // Update currentTrackIndex
+        currentTrackIndex = allTracks.findIndex(
+          (track) => track.fullPath === fullPath
+        );
+
+        // Update visual playing state
+        document
+          .querySelectorAll(".file")
+          .forEach((file) => file.classList.remove("playing"));
+        const playingFile = Array.from(document.querySelectorAll(".file")).find(
+          (file) => file.querySelector("span").textContent === name
+        );
+        if (playingFile) playingFile.classList.add("playing");
+      }
+
+      // Event Listeners
+      uploadZone.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        uploadZone.classList.add("dragover");
+      });
+
+      uploadZone.addEventListener("dragleave", () => {
+        uploadZone.classList.remove("dragover");
+      });
+
+      uploadZone.addEventListener("drop", (e) => {
+        e.preventDefault();
+        uploadZone.classList.remove("dragover");
+        handleFiles({ target: { files: e.dataTransfer.files } });
+      });
+
+      folderInput.addEventListener("change", handleFiles);
+
+      searchInput.addEventListener("input", (e) => {
+        renderFolderStructure(e.target.value);
+        // Open all folders when searching
+        if (e.target.value) {
+          document.querySelectorAll(".folder-content").forEach((folder) => {
+            folder.classList.add("open");
+          });
+        }
+      });
+
+      // Player Controls
+      playPauseBtn.addEventListener("click", () => {
+        if (audioPlayer.paused) {
+          if (!audioPlayer.src && allTracks.length > 0) {
+            playFile(
+              allTracks[0].path,
+              allTracks[0].name,
+              allTracks[0].fullPath
+            );
+          } else {
+            audioPlayer.play();
+          }
+          playPauseBtn.textContent = "Pause";
+        } else {
+          audioPlayer.pause();
+          playPauseBtn.textContent = "Play";
+        }
+      });
+
+      prevBtn.addEventListener("click", () => {
+        if (currentTrackIndex > 0) {
+          const prevTrack = allTracks[currentTrackIndex - 1];
+          playFile(prevTrack.path, prevTrack.name, prevTrack.fullPath);
+        }
+      });
+
+      nextBtn.addEventListener("click", () => {
+        if (currentTrackIndex < allTracks.length - 1) {
+          const nextTrack = allTracks[currentTrackIndex + 1];
+          playFile(nextTrack.path, nextTrack.name, nextTrack.fullPath);
+        }
+      });
+
+      // Progress bar
+      audioPlayer.addEventListener("timeupdate", () => {
+        const percentage =
+          (audioPlayer.currentTime / audioPlayer.duration) * 100;
+        progress.style.width = percentage + "%";
+      });
+
+      progressBar.addEventListener("click", (e) => {
+        const rect = progressBar.getBoundingClientRect();
+        const percentage = (e.clientX - rect.left) / rect.width;
+        audioPlayer.currentTime = percentage * audioPlayer.duration;
+      });
+
+      // Volume control
+      volumeControl.addEventListener("input", (e) => {
+        audioPlayer.volume = e.target.value;
+      });
+
+      // Auto-play next track
+      audioPlayer.addEventListener("ended", () => {
+        if (currentTrackIndex < allTracks.length - 1) {
+          const nextTrack = allTracks[currentTrackIndex + 1];
+          playFile(nextTrack.path, nextTrack.name, nextTrack.fullPath);
+        }
+      });
+
+      // Keyboard controls
+      document.addEventListener("keydown", (e) => {
+        if (e.code === "Space") {
+          e.preventDefault();
+          playPauseBtn.click();
+        } else if (e.code === "ArrowLeft") {
+          prevBtn.click();
+        } else if (e.code === "ArrowRight") {
+          nextBtn.click();
+        }
+      });
+    </script>
+  </body>
+</html>
