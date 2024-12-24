@@ -1,0 +1,109 @@
+:root {
+  --background-color: #f0f0f0;
+  --text-color: #121212;
+  --input-background: #ffffff;
+  --input-border: #ccc;
+  --button-background: #007fff;
+  --button-hover: #198cff;
+  --audio-controls-bg: #ccc;
+}
+
+html::-webkit-scrollbar {
+  width: 0;
+}
+
+.container {
+  visibility: visible;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background-color: #121212;
+    --text-color: #e0e0e0;
+    --input-background: #1e1e1e;
+    --input-border: #333;
+    --button-background: #007fff;
+    --button-hover: #198cff;
+    --audio-controls-bg: #999;
+  }
+}
+
+body {
+  font-family: Arial, sans-serif;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  text-align: center;
+  background: #020106;
+  background: -webkit-linear-gradient(to right, #070712, #0d0d1a, #020106);
+  background: linear-gradient(to right, #070712, #0d0d1a, #020106);
+}
+
+#urlInput {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  margin-bottom: 20px;
+  height: 54px;
+  box-sizing: border-box;
+  background-color: var(--input-background);
+  border: 1px solid var(--input-border);
+  color: var(--text-color);
+  border-radius: 10px;
+  outline: 0;
+  border: 0;
+  font-size: 1rem;
+}
+
+#playButton {
+  padding: 10px 20px;
+  background-color: var(--button-background);
+  color: white;
+  border: none;
+  cursor: pointer;
+  margin: 10px 0;
+  transition: background-color 0.3s ease;
+  border-radius: 10px;
+  display: none;
+}
+
+#playButton:hover {
+  background-color: var(--button-hover);
+}
+
+#audioPlayer {
+  margin-top: 20px;
+  width: 100%;
+}
+
+#errorMessage {
+  color: #ff6b6b;
+  margin-top: 10px;
+  display: none;
+}
+
+h1 {
+  color: var(--text-color);
+}
+
+audio::-webkit-media-controls-enclosure {
+  background-color: var(--audio-controls-bg);
+  border-radius: 10px;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  margin-top: -7rem;
+  transition: opacity 0.5s ease, visibility 0.5s ease;
+  visibility: hidden;
+  opacity: 0;
+}
+
+.parent-container:hover .container {
+  opacity: 1;
+  visibility: visible;
+}
