@@ -1,0 +1,121 @@
+// // Audio Context for detecting system audio changes
+// let audioContext = null;
+// let mediaStreamSource = null;
+// let wasPlayingBeforeCall = false;
+
+// // Initialize audio context and monitoring
+// async function initializeAudioContext() {
+//   try {
+//     audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+//     // Create an analyzer to monitor audio
+//     const analyzer = audioContext.createAnalyser();
+
+//     // Get system audio stream
+//     const stream = await navigator.mediaDevices.getUserMedia({
+//       audio: {
+//         mandatory: {
+//           echoCancellation: true,
+//           googEchoCancellation: true,
+//           googAutoGainControl: true,
+//           googNoiseSuppression: true,
+//           googHighpassFilter: true,
+//           googTypingNoiseDetection: true,
+//           googAudioMirroring: true,
+//         },
+//       },
+//     });
+
+//     mediaStreamSource = audioContext.createMediaStreamSource(stream);
+//     mediaStreamSource.connect(analyzer);
+
+//     // Monitor for audio context state changes
+//     audioContext.addEventListener("statechange", () => {
+//       console.log("Audio context state changed:", audioContext.state);
+//       handleAudioContextChange();
+//     });
+
+//     // Monitor for system audio changes
+//     navigator.mediaDevices.addEventListener("devicechange", () => {
+//       console.log("Audio devices changed");
+//       handleAudioContextChange();
+//     });
+//   } catch (error) {
+//     console.error("Error initializing audio context:", error);
+//     errorMessage.textContent =
+//       "Unable to initialize call detection. Please grant microphone permissions.";
+//   }
+// }
+
+// // Handle audio context changes
+// function handleAudioContextChange() {
+//   if (
+//     audioContext.state === "suspended" ||
+//     audioContext.state === "interrupted"
+//   ) {
+//     // Possible incoming call - save current playing state and pause
+//     wasPlayingBeforeCall = !audioPlayer.paused;
+//     if (wasPlayingBeforeCall) {
+//       fadeOut(() => audioPlayer.pause());
+//     }
+//   } else if (audioContext.state === "running" && wasPlayingBeforeCall) {
+//     // Call might have ended - resume if it was playing before
+//     audioPlayer.volume = 0;
+//     audioPlayer.play().then(() => fadeIn());
+//     wasPlayingBeforeCall = false;
+//   }
+// }
+
+// Initialize audio context when page loads
+window.addEventListener("DOMContentLoaded", () => {
+  // initializeAudioContext();
+
+  if (savedUrl) {
+    urlInput.value = savedUrl;
+    audioPlayer.src = savedUrl;
+    audioPlayer.loop = true;
+
+    audioPlayer.addEventListener("loadedmetadata", () => {
+      if (savedTime) {
+        audioPlayer.currentTime = parseFloat(savedTime);
+      }
+    });
+  }
+});
+
+
+
+// // Add this to your existing JavaScript code
+// let wasWhatsAppRunning = false;
+// let wasPlayingBeforeCall = false;
+
+// async function checkWhatsAppStatus() {
+//   try {
+//     const response = await fetch("http://localhost:3000");
+//     const isRunning = (await response.text()) === "true";
+
+//     // If WhatsApp just started running
+//     if (isRunning && !wasWhatsAppRunning) {
+//       wasWhatsAppRunning = true;
+//       if (!audioPlayer.paused) {
+//         wasPlayingBeforeCall = true;
+//         fadeOut(() => audioPlayer.pause());
+//       }
+//     }
+//     // If WhatsApp just stopped running
+//     else if (!isRunning && wasWhatsAppRunning) {
+//       wasWhatsAppRunning = false;
+//       if (wasPlayingBeforeCall) {
+//         wasPlayingBeforeCall = false;
+//         audioPlayer.volume = 0;
+//         audioPlayer.play().then(() => fadeIn());
+//       }
+//     }
+//   } catch (error) {
+//     console.log("Server not connected");
+//   }
+// }
+
+// // Check every second
+
+// setInterval(checkWhatsAppStatus, 1000);

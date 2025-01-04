@@ -1,0 +1,767 @@
+// Add functionality to hide/unhide the container div and control volume with arrow keys
+// const container = document.querySelector(".container");
+// let isContainerVisible = true;
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "ArrowUp") {
+    // Volume Up
+    audioPlayer.volume = Math.min(audioPlayer.volume + 0.1, 1);
+  } else if (event.key === "ArrowDown") {
+    // Volume Down
+    audioPlayer.volume = Math.max(audioPlayer.volume - 0.1, 0);
+  }
+  // else if (event.key === "e") {
+  //   // Toggle hide/unhide for the container div
+  //   isContainerVisible = !isContainerVisible;
+  //   container.style.visibility = isContainerVisible ? "visible" : "hidden";
+  // }
+});
+
+// // Initial setup: container should be hidden by default and fade out after a delay
+// let hideTimeout;
+
+// // Add event listeners for mouse hover functionality
+// container.addEventListener("mouseenter", () => {
+//   // Ensure the container is visible when hovered
+//   container.style.visibility = "visible";
+//   container.style.opacity = "1";
+//   console.log("enter");
+//   // Reset the timer when hovering to prevent auto-hide
+//   clearTimeout(hideTimeout);
+// });
+
+// container.addEventListener("mouseleave", () => {
+//   console.log("leave");
+//   container.style.opacity = "0";
+//   container.style.visibility = "hidden";
+//   // Set a timer to hide the container after a delay if not hovered
+//   // hideTimeout = setTimeout(() => {
+//   // setTimeout(() => {
+//   // }, 500); // Match the CSS transition duration
+//   // }, 2000); // Hide the container after 2 seconds of no hover
+// });
+
+// setTimeout(() => {
+//   container.style.visibility = "hidden";
+//   container.style.opacity = "0";
+// }, 2000); // Set the initial delay for the container to be hidden
+
+// import "./style.css";
+// import { setupEventListeners } from "./utils/eventHandlers";
+
+// const urlInput = document.getElementById("urlInput");
+// const playButton = document.getElementById("playButton");
+// const audioPlayer = document.getElementById("audioPlayer");
+// const errorMessage = document.getElementById("errorMessage");
+
+// // Initialize the application by setting up event listeners
+// setupEventListeners(audioPlayer, urlInput, playButton, errorMessage);
+
+// // Add functionality to hide/unhide the container div and control volume with arrow keys
+// const container = document.querySelector(".container");
+// let isContainerVisible = true;
+
+// document.addEventListener("keydown", (event) => {
+//   if (event.key === "ArrowUp") {
+//     // Volume Up
+//     audioPlayer.volume = Math.min(audioPlayer.volume + 0.1, 1);
+//   } else if (event.key === "ArrowDown") {
+//     // Volume Down
+//     audioPlayer.volume = Math.max(audioPlayer.volume - 0.1, 0);
+//   } else if (event.key === "e") {
+//     // Toggle hide/unhide for the container div
+//     isContainerVisible = !isContainerVisible;
+//     container.style.visibility = isContainerVisible ? "visible" : "hidden";
+//   }
+// });
+
+
+23:15 04 January 2025
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+  Maybe Create an npm package which then give a command to run a server
+  Or a bash function which cds into the directory and runs the server
+  Then on a custom port localhost it run the website which now has the clipboard access
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="shortcut icon"
+      href="https://www.svgrepo.com/show/268463/music-player-music.svg"
+      type="image/x-icon"
+    />
+    <title>Player</title>
+  </head>
+  <body>
+    <div class="parent-container">
+      <div class="container">
+        <input type="text" id="urlInput" placeholder="Enter audio file URL" />
+        <button id="playButton">Play</button>
+        <div id="errorMessage"></div>
+        <audio id="audioPlayer" controls loop autoplay></audio>
+      </div>
+    </div>
+
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html> -->
+
+<!-- <!DOCTYPE html> -->
+<!-- <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="shortcut icon"
+      href="https://www.svgrepo.com/show/268463/music-player-music.svg"
+      type="image/x-icon"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <title>Player</title>
+    <style>
+      :root {
+        --background-color: #f0f0f0;
+        --text-color: #121212;
+        --input-background: #ffffff;
+        --input-border: #ccc;
+        --button-background: #007fff;
+        --button-hover: #198cff;
+        --audio-controls-bg: #ccc;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --background-color: #121212;
+          --text-color: #e0e0e0;
+          --input-background: #1e1e1e;
+          --input-border: #333;
+          --button-background: #007fff;
+          --button-hover: #198cff;
+          --audio-controls-bg: #999;
+        }
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html::-webkit-scrollbar {
+        width: 0;
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f12711;
+        background: -webkit-linear-gradient(to right, #f5af19, #f12711);
+        background: linear-gradient(to right, #f5af19, #f12711);
+      }
+
+      @media (prefers-color-scheme: dark) {
+        body {
+          background: #020106;
+          background: -webkit-linear-gradient(
+            to right,
+            #070712,
+            #0d0d1a,
+            #020106
+          );
+          background: linear-gradient(to right, #070712, #0d0d1a, #020106);
+        }
+      }
+
+      .parent-container {
+        width: 100%;
+        max-width: 600px;
+        margin: 20px;
+        background: var(--input-background);
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+
+      .container {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        margin-top: -7rem;
+        transition: opacity 0.5s ease, visibility 0.5s ease;
+        visibility: hidden;
+        opacity: 0;
+      }
+
+      .parent-container:hover .container {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .upload-section {
+        border: 2px dashed var(--input-border);
+        padding: 20px;
+        text-align: center;
+        margin-bottom: 20px;
+        border-radius: 10px;
+        background: var(--input-background);
+        cursor: pointer;
+        color: var(--text-color);
+      }
+
+      .upload-section:hover {
+        border-color: var(--button-background);
+        background: var(--input-background);
+      }
+
+      #urlInput {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        margin-bottom: 20px;
+        height: 54px;
+        box-sizing: border-box;
+        background-color: var(--input-background);
+        color: var(--text-color);
+        border-radius: 10px;
+        outline: 0;
+        border: 0;
+        font-size: 1rem;
+      }
+
+      #playButton {
+        padding: 10px 20px;
+        background-color: var(--button-background);
+        color: white;
+        border: none;
+        cursor: pointer;
+        margin: 10px 0;
+        transition: background-color 0.3s ease;
+        border-radius: 10px;
+        display: none;
+      }
+
+      #playButton:hover {
+        background-color: var(--button-hover);
+      }
+
+      #errorMessage {
+        color: #ff6b6b;
+        margin-top: 10px;
+        display: none;
+      }
+
+      #audioPlayer {
+        width: 100%;
+        margin-top: 20px;
+      }
+
+      audio::-webkit-media-controls-enclosure {
+        background-color: var(--audio-controls-bg);
+        border-radius: 10px;
+      }
+
+      .song-list {
+        max-height: 300px;
+        overflow-y: auto;
+        border: 1px solid var(--input-border);
+        border-radius: 10px;
+        margin: 10px 0;
+        background: var(--input-background);
+      }
+
+      .song-item {
+        padding: 8px 12px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        border-bottom: 1px solid var(--input-border);
+        color: var(--text-color);
+      }
+
+      .song-item:hover {
+        background: var(--input-border);
+      }
+
+      .song-item.playing {
+        background: var(--button-background);
+        color: white;
+      }
+
+      .song-item i {
+        margin-right: 10px;
+      }
+
+      h1 {
+        color: var(--text-color);
+        margin-bottom: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="parent-container">
+      <div class="container">
+        <div class="upload-section" id="upload-zone">
+          <input
+            type="file"
+            id="folder-input"
+            webkitdirectory
+            directory
+            multiple
+            style="display: none"
+          />
+          <label for="folder-input"
+            >Drop your music folder here or click to select</label
+          >
+        </div>
+
+        <input
+          type="text"
+          id="urlInput"
+          placeholder="Search songs or enter audio URL"
+        />
+        <button id="playButton">Play</button>
+        <div id="errorMessage"></div>
+        <div class="song-list" id="songList"></div>
+        <audio id="audioPlayer" controls loop></audio>
+      </div>
+    </div>
+
+    <script>
+      const urlInput = document.getElementById("urlInput");
+      const playButton = document.getElementById("playButton");
+      const audioPlayer = document.getElementById("audioPlayer");
+      const errorMessage = document.getElementById("errorMessage");
+      const uploadZone = document.getElementById("upload-zone");
+      const folderInput = document.getElementById("folder-input");
+      const songList = document.getElementById("songList");
+
+      let songs = JSON.parse(localStorage.getItem("songs") || "[]");
+      const savedUrl = localStorage.getItem("audioUrl");
+      const savedTime = localStorage.getItem("audioTime");
+
+      // Fade configuration
+      const FADE_DURATION = 1000;
+      const FADE_INTERVAL = 50;
+      let fadeTimeout = null;
+
+      // Initialize saved state
+      if (savedUrl) {
+        urlInput.value = savedUrl;
+        audioPlayer.src = savedUrl;
+        audioPlayer.addEventListener("loadedmetadata", () => {
+          if (savedTime) {
+            audioPlayer.currentTime = parseFloat(savedTime);
+          }
+        });
+      }
+
+      // Render song list
+      function renderSongs(searchTerm = "") {
+        songList.innerHTML = "";
+        const filteredSongs = songs.filter((song) =>
+          song.name.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+
+        filteredSongs.forEach((song) => {
+          const songItem = document.createElement("div");
+          songItem.className = "song-item";
+          songItem.innerHTML = `
+            <i class="fas fa-music"></i>
+            <span>${song.name}</span>
+          `;
+          songItem.addEventListener("click", () => playAudio(song.url));
+          songList.appendChild(songItem);
+        });
+      }
+
+      // Handle file uploads
+      function handleFiles(files) {
+        const audioFiles = Array.from(files).filter((file) =>
+          file.type.includes("audio")
+        );
+
+        audioFiles.forEach((file) => {
+          const songUrl = URL.createObjectURL(file);
+          songs.push({
+            name: file.name,
+            url: songUrl,
+            path: file.webkitRelativePath || file.name,
+          });
+        });
+
+        localStorage.setItem("songs", JSON.stringify(songs));
+        renderSongs();
+      }
+
+      // Fade functions
+      function fadeOut(onComplete) {
+        const steps = FADE_DURATION / FADE_INTERVAL;
+        const volumeStep = audioPlayer.volume / steps;
+
+        const fade = () => {
+          if (audioPlayer.volume > volumeStep) {
+            audioPlayer.volume -= volumeStep;
+            fadeTimeout = setTimeout(fade, FADE_INTERVAL);
+          } else {
+            audioPlayer.volume = 0;
+            if (onComplete) onComplete();
+          }
+        };
+
+        fade();
+      }
+
+      function fadeIn() {
+        const targetVolume = 1.0;
+        const steps = FADE_DURATION / FADE_INTERVAL;
+        const volumeStep = targetVolume / steps;
+
+        const fade = () => {
+          if (audioPlayer.volume < targetVolume - volumeStep) {
+            audioPlayer.volume += volumeStep;
+            fadeTimeout = setTimeout(fade, FADE_INTERVAL);
+          } else {
+            audioPlayer.volume = targetVolume;
+          }
+        };
+
+        fade();
+      }
+
+      async function playAudio(url) {
+        if (fadeTimeout) {
+          clearTimeout(fadeTimeout);
+        }
+
+        if (!audioPlayer.paused) {
+          await new Promise((resolve) => {
+            fadeOut(() => {
+              audioPlayer.pause();
+              resolve();
+            });
+          });
+        }
+
+        audioPlayer.volume = 0;
+        localStorage.removeItem("audioTime");
+
+        audioPlayer.src = url;
+        localStorage.setItem("audioUrl", url);
+
+        audioPlayer.addEventListener("loadedmetadata", () => {
+          audioPlayer.currentTime = 0;
+          audioPlayer
+            .play()
+            .then(() => fadeIn())
+            .catch((error) => {
+              errorMessage.textContent = `Error playing audio: ${error.message}`;
+            });
+        });
+
+        // Update visual playing state
+        document.querySelectorAll(".song-item").forEach((item) => {
+          item.classList.toggle(
+            "playing",
+            item.querySelector("span").textContent === name
+          );
+        });
+      }
+
+      // Event Listeners
+      playButton.addEventListener("click", () => {
+        const audioUrl = urlInput.value.trim();
+        if (!audioUrl) {
+          errorMessage.textContent = "Please enter a URL";
+          return;
+        }
+        playAudio(audioUrl);
+      });
+
+      urlInput.addEventListener("input", (e) => {
+        renderSongs(e.target.value);
+      });
+
+      uploadZone.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        uploadZone.style.borderColor = "#2196f3";
+        uploadZone.style.background = "#e3f2fd";
+      });
+
+      uploadZone.addEventListener("dragleave", () => {
+        uploadZone.style.borderColor = "#ccc";
+        uploadZone.style.background = "#fafafa";
+      });
+
+      uploadZone.addEventListener("drop", (e) => {
+        e.preventDefault();
+        uploadZone.style.borderColor = "#ccc";
+        uploadZone.style.background = "#fafafa";
+        handleFiles(e.dataTransfer.files);
+      });
+
+      folderInput.addEventListener("change", (e) =>
+        handleFiles(e.target.files)
+      );
+
+      audioPlayer.addEventListener("timeupdate", () => {
+        localStorage.setItem("audioTime", audioPlayer.currentTime);
+      });
+
+      // Keyboard shortcuts
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "/") {
+          event.preventDefault();
+          urlInput.focus();
+          urlInput.value = "";
+        } else if (event.key === "Escape") {
+          urlInput.blur();
+          urlInput.value = savedUrl;
+        } else if (
+          event.code === "Space" &&
+          document.activeElement !== urlInput
+        ) {
+          event.preventDefault();
+          if (audioPlayer.paused) {
+            audioPlayer.volume = 0;
+            audioPlayer.play().then(() => fadeIn());
+          } else {
+            fadeOut(() => audioPlayer.pause());
+          }
+        } else if (event.key === "ArrowUp") {
+          audioPlayer.volume = Math.min(audioPlayer.volume + 0.1, 1);
+        } else if (event.key === "ArrowDown") {
+          audioPlayer.volume = Math.max(audioPlayer.volume - 0.1, 0);
+        } else if (event.key === "ArrowRight") {
+          audioPlayer.currentTime = Math.min(
+            audioPlayer.currentTime + 2.5,
+            audioPlayer.duration
+          );
+        } else if (event.key === "ArrowLeft") {
+          audioPlayer.currentTime = Math.max(audioPlayer.currentTime - 2.5, 0);
+        }
+      });
+
+      // Initialize song list
+      renderSongs();
+    </script>
+  </body>
+</html> -->
+
+
+
+// const urlInput = document.getElementById("urlInput");
+// const playButton = document.getElementById("playButton");
+// const audioPlayer = document.getElementById("audioPlayer");
+// const errorMessage = document.getElementById("errorMessage");
+// const savedUrl = localStorage.getItem("audioUrl");
+// const savedTime = localStorage.getItem("audioTime");
+
+// // Fade configuration
+// const FADE_DURATION = 1000; // Duration of fade in milliseconds
+// const FADE_INTERVAL = 50; // How often to update volume during fade (milliseconds)
+// let fadeTimeout = null;
+
+// // Load saved URL and playback time from localStorage on page load
+// window.addEventListener("DOMContentLoaded", () => {
+//   if (savedUrl) {
+//     urlInput.value = savedUrl;
+//     audioPlayer.src = savedUrl;
+//     audioPlayer.loop = true;
+
+//     audioPlayer.addEventListener("loadedmetadata", () => {
+//       if (savedTime) {
+//         audioPlayer.currentTime = parseFloat(savedTime);
+//       }
+//     });
+//   }
+// });
+
+// // Save the current playback time in localStorage as the song plays
+// audioPlayer.addEventListener("timeupdate", () => {
+//   localStorage.setItem("audioTime", audioPlayer.currentTime);
+// });
+
+// function fadeOut(onComplete) {
+//   const steps = FADE_DURATION / FADE_INTERVAL;
+//   const volumeStep = audioPlayer.volume / steps;
+
+//   const fade = () => {
+//     if (audioPlayer.volume > volumeStep) {
+//       audioPlayer.volume -= volumeStep;
+//       fadeTimeout = setTimeout(fade, FADE_INTERVAL);
+//     } else {
+//       audioPlayer.volume = 0;
+//       if (onComplete) onComplete();
+//     }
+//   };
+
+//   fade();
+// }
+
+// function fadeIn() {
+//   const targetVolume = 1.0;
+//   const steps = FADE_DURATION / FADE_INTERVAL;
+//   const volumeStep = targetVolume / steps;
+
+//   const fade = () => {
+//     if (audioPlayer.volume < targetVolume - volumeStep) {
+//       audioPlayer.volume += volumeStep;
+//       fadeTimeout = setTimeout(fade, FADE_INTERVAL);
+//     } else {
+//       audioPlayer.volume = targetVolume;
+//     }
+//   };
+
+//   fade();
+// }
+
+// async function playAudio(url) {
+//   // Clear any existing fade
+//   if (fadeTimeout) {
+//     clearTimeout(fadeTimeout);
+//   }
+
+//   // If audio is currently playing, fade it out first
+//   if (!audioPlayer.paused) {
+//     await new Promise((resolve) => {
+//       fadeOut(() => {
+//         audioPlayer.pause();
+//         resolve();
+//       });
+//     });
+//   }
+
+//   // Reset volume to 0 for fade-in
+//   audioPlayer.volume = 0;
+
+//   // Clear the saved playback time in localStorage
+//   localStorage.removeItem("audioTime");
+
+//   // Set the audio source and ensure loop is set
+//   audioPlayer.src = url;
+//   audioPlayer.loop = true;
+
+//   // When the metadata is loaded, reset the playback time and play with fade-in
+//   audioPlayer.addEventListener("loadedmetadata", () => {
+//     audioPlayer.currentTime = 0;
+//     audioPlayer
+//       .play()
+//       .then(() => {
+//         fadeIn();
+//       })
+//       .catch((error) => {
+//         errorMessage.textContent = `Error playing audio: ${error.message}`;
+//       });
+//   });
+// }
+
+// // Play button click handler
+// playButton.addEventListener("click", () => {
+//   const audioUrl = urlInput.value.trim();
+
+//   if (!audioUrl) {
+//     errorMessage.textContent = "Please enter a URL";
+//     return;
+//   }
+
+//   // Save the URL to localStorage
+//   localStorage.setItem("audioUrl", audioUrl);
+
+//   // Call the playAudio function
+//   playAudio(audioUrl);
+// });
+
+// // Input field event handlers
+// urlInput.addEventListener("keydown", (event) => {
+//   if (event.key === "Enter") {
+//     playButton.click();
+//     urlInput.blur();
+//   }
+
+//   if (event.ctrlKey && event.key === "v") {
+//     setTimeout(() => {
+//       playButton.click();
+//       urlInput.blur();
+//     }, 100);
+//   }
+// });
+
+// // Error handling for audio element
+// audioPlayer.addEventListener("error", (e) => {
+//   errorMessage.textContent =
+//     "Unable to load or play the audio file. Check the URL and file access.";
+// });
+
+// // // Keyboard shortcuts
+// document.addEventListener("keydown", (event) => {
+//   if (event.key === "/") {
+//     event.preventDefault();
+//     urlInput.focus();
+//     urlInput.value = "";
+//   } else if (event.key === "Escape") {
+//     urlInput.blur();
+//     urlInput.value = savedUrl;
+//   } else if (event.code === "Space") {
+//     event.preventDefault();
+//     if (audioPlayer.paused) {
+//       audioPlayer.volume = 0;
+//       audioPlayer.play().then(() => fadeIn());
+//     } else {
+//       fadeOut(() => audioPlayer.pause());
+//     }
+//   }
+// });
+
+// document.addEventListener("paste", function (e) {
+//   // This will work when user manually pastes
+//   const text = e.clipboardData.getData("text");
+//   e.preventDefault();
+//   urlInput.focus();
+//   urlInput.value = "";
+//   urlInput.value = text;
+//   setTimeout(() => {
+//     playButton.click();
+//     urlInput.blur();
+//   }, 10);
+// });
+
+// // Add functionality to hide/unhide the container div and control volume with arrow keys
+// // const container = document.querySelector(".container");
+// // let isContainerVisible = true;
+
+// document.addEventListener("keydown", (event) => {
+//   if (event.key === "ArrowUp") {
+//     // Volume Up
+//     audioPlayer.volume = Math.min(audioPlayer.volume + 0.1, 1);
+//   } else if (event.key === "ArrowDown") {
+//     // Volume Down
+//     audioPlayer.volume = Math.max(audioPlayer.volume - 0.1, 0);
+//   } else if (event.key === "ArrowRight") {
+//     // Seek Forward
+//     audioPlayer.currentTime = Math.min(
+//       audioPlayer.currentTime + 2.5,
+//       audioPlayer.duration
+//     );
+//   } else if (event.key === "ArrowLeft") {
+//     // Seek Backward
+//     audioPlayer.currentTime = Math.max(audioPlayer.currentTime - 2.5, 0);
+//   }
+//   // else if (event.key === "e") {
+//   //   // Toggle hide/unhide for the container div
+//   //   isContainerVisible = !isContainerVisible;
+//   //   container.style.visibility = isContainerVisible ? "visible" : "hidden";
+//   // }
+// });

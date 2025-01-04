@@ -1,8 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-  <!-- Maybe Create an npm package which then give a command to run a server  -->
-  <!-- Or a bash function which cds into the directory and runs the server -->
-  <!-- Then on a custom port localhost it run the website which now has the clipboard access -->
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -16,13 +13,22 @@
   <body>
     <div class="parent-container">
       <div class="container">
-        <input type="text" id="urlInput" placeholder="Enter audio file URL" />
-        <button id="playButton">Play</button>
+        <div class="upload-section">
+          <input
+            type="file"
+            id="folder-input"
+            webkitdirectory
+            directory
+            multiple
+          />
+          <p>Drop your music folder here or click to select</p>
+        </div>
+        <input type="text" id="urlInput" placeholder="Search songs..." />
+        <div id="songList" class="song-list"></div>
         <div id="errorMessage"></div>
-        <audio id="audioPlayer" controls loop autoplay></audio>
+        <audio id="audioPlayer" controls loop></audio>
       </div>
     </div>
-
     <script type="module" src="./src/main.js"></script>
   </body>
 </html>

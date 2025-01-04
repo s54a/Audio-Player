@@ -6,14 +6,8 @@
   --button-background: #007fff;
   --button-hover: #198cff;
   --audio-controls-bg: #ccc;
-}
-
-html::-webkit-scrollbar {
-  width: 0;
-}
-
-.container {
-  visibility: visible;
+  --gradient-light: linear-gradient(to right, #f5af19, #f12711);
+  --gradient-dark: linear-gradient(to right, #070712, #0d0d1a, #020106);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -22,10 +16,12 @@ html::-webkit-scrollbar {
     --text-color: #e0e0e0;
     --input-background: #1e1e1e;
     --input-border: #333;
-    --button-background: #007fff;
-    --button-hover: #198cff;
     --audio-controls-bg: #999;
   }
+}
+
+html::-webkit-scrollbar {
+  width: 0;
 }
 
 body {
@@ -34,24 +30,35 @@ body {
   margin: 0 auto;
   padding: 20px;
   text-align: center;
-  background: #020106;
-  background: -webkit-linear-gradient(to right, #070712, #0d0d1a, #020106);
-  background: linear-gradient(to right, #070712, #0d0d1a, #020106);
+  background: var(--gradient-light);
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background: var(--gradient-dark);
+  }
+}
+
+.upload-section {
+  margin-bottom: 20px;
+  padding: 20px;
+  border: 2px dashed var(--input-border);
+  border-radius: 10px;
+  background-color: var(--input-background);
+  color: var(--text-color);
 }
 
 #urlInput {
   width: 100%;
   padding: 10px;
-  margin: 10px 0;
-  margin-bottom: 20px;
+  margin: 10px 0 20px;
   height: 54px;
   box-sizing: border-box;
   background-color: var(--input-background);
   border: 1px solid var(--input-border);
   color: var(--text-color);
   border-radius: 10px;
-  outline: 0;
-  border: 0;
+  outline: none;
   font-size: 1rem;
 }
 
@@ -64,7 +71,6 @@ body {
   margin: 10px 0;
   transition: background-color 0.3s ease;
   border-radius: 10px;
-  display: none;
 }
 
 #playButton:hover {
@@ -82,13 +88,32 @@ body {
   display: none;
 }
 
-h1 {
-  color: var(--text-color);
+.song-list {
+  max-height: 300px;
+  overflow-y: auto;
+  margin: 20px 0;
+  background-color: var(--input-background);
+  border-radius: 10px;
+  padding: 10px;
 }
 
-audio::-webkit-media-controls-enclosure {
-  background-color: var(--audio-controls-bg);
-  border-radius: 10px;
+.song-item {
+  padding: 10px;
+  cursor: pointer;
+  color: var(--text-color);
+  border-radius: 5px;
+  margin: 5px 0;
+  text-align: left;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.song-item:hover {
+  background-color: var(--button-background);
+  color: white;
+}
+
+h1 {
+  color: var(--text-color);
 }
 
 .container {
@@ -96,8 +121,9 @@ audio::-webkit-media-controls-enclosure {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100vh;
-  margin-top: -7rem;
+  min-height: 100vh;
+  padding: 20px;
+  box-sizing: border-box;
   transition: opacity 0.5s ease, visibility 0.5s ease;
   visibility: hidden;
   opacity: 0;

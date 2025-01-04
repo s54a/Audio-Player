@@ -1,0 +1,89 @@
+// Run this before running python script
+// pip install psutil
+// # whatsapp_monitor.py
+// import http.server
+// import socketserver
+// import psutil
+// import json
+// from threading import Thread
+// import time
+
+// PORT = 3000
+// last_state = False
+
+// class RequestHandler(http.server.SimpleHTTPRequestHandler):
+//     def do_GET(self):
+//         # Add CORS headers
+//         self.send_response(200)
+//         self.send_header('Content-type', 'text/plain')
+//         self.send_header('Access-Control-Allow-Origin', '*')
+//         self.end_headers()
+
+//         # Return current WhatsApp state
+//         self.wfile.write(str(is_whatsapp_active()).encode())
+
+//     def log_message(self, format, *args):
+//         # Disable logging for better performance
+//         pass
+
+// def is_whatsapp_active():
+//     """Check if WhatsApp is running and using audio"""
+//     try:
+//         for proc in psutil.process_iter(['name', 'cpu_percent']):
+//             if proc.info['name'] == 'WhatsApp.exe':
+//                 # Check if WhatsApp is using CPU (might indicate active call)
+//                 if proc.info['cpu_percent'] > 1.0:
+//                     return True
+//         return False
+//     except:
+//         return False
+
+// def run_server():
+//     with socketserver.TCPServer(("", PORT), RequestHandler) as httpd:
+//         print(f"Server started at http://localhost:{PORT}")
+//         print(f"Current RAM usage: {psutil.Process().memory_info().rss / 1024 / 1024:.1f} MB")
+//         httpd.serve_forever()
+
+// if __name__ == "__main__":
+//     try:
+//         run_server()
+//     except KeyboardInterrupt:
+//         print("\nShutting down server...")
+// Add this to your existing JavaScript code
+// let wasWhatsAppRunning = false;
+// let wasPlayingBeforeCall = false;
+
+// async function checkWhatsAppStatus() {
+//   try {
+//     const response = await fetch("http://localhost:3000");
+//     console.log(response);
+//     const isRunning = (await response.text()) === "true";
+
+//     // If WhatsApp just started running actively
+//     if (isRunning && !wasWhatsAppRunning) {
+//       wasWhatsAppRunning = true;
+//       if (!audioPlayer.paused) {
+//         wasPlayingBeforeCall = true;
+//         fadeOut(() => audioPlayer.pause());
+//       }
+//     }
+//     // If WhatsApp just stopped running actively
+//     else if (!isRunning && wasWhatsAppRunning) {
+//       wasWhatsAppRunning = false;
+//       if (wasPlayingBeforeCall) {
+//         wasPlayingBeforeCall = false;
+//         audioPlayer.volume = 0;
+//         audioPlayer.play().then(() => fadeIn());
+//       }
+//     }
+//   } catch (error) {
+//     console.log("Server not connected");
+//   }
+// }
+
+// // Check every second
+
+// setInterval(checkWhatsAppStatus, 1000);
+
+
+https://claude.ai/chat/df161c0b-36c2-4e81-8030-7053fe36fdc0
