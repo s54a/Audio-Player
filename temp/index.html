@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>IndexedDB File Storage</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+      }
+      #upload-zone {
+        border: 2px dashed #ccc;
+        padding: 20px;
+        text-align: center;
+        margin-bottom: 20px;
+        cursor: pointer;
+      }
+      #file-list {
+        list-style: none;
+        padding: 0;
+      }
+      #file-list li {
+        padding: 5px 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      audio {
+        margin-top: 20px;
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="upload-zone">Drop audio files here or click to upload</div>
+    <input
+      type="file"
+      id="file-input"
+      multiple
+      webkitdirectory
+      style="display: none"
+    />
+    <button id="load-files">Load Saved Files</button>
+    <ul id="file-list"></ul>
+    <audio id="audio-player" controls></audio>
+
+    <script>
+      const uploadZone = document.getElementById("upload-zone");
+      const fileInput = document.getElementById("file-input");
+      const loadFilesBtn = document.getElementById("load-files");
+      const fileList = document.getElementById("file-list");
+      const audioPlayer = document.getElementById("audio-player");
+
+      uploadZone.addEventListener("click", () => fileInput.click());
+      uploadZone.addEventListener("dragover", (e) => e.preventDefault());
+      uploadZone.addEventListener("drop", (e) => {
+        e.preventDefault();
+        handleFiles(e.dataTransfer.files);
+      });
+      fileInput.addEventListener("change", () => handleFiles(fileInput.files));
+      loadFilesBtn.addEventListener("click", loadFilesFromIndexedDB);
+
+      function handleFiles(files) {
+        const audioFiles = Array.from(files).filter((file) =>
+          file.type.includes("audio")
+        );
+        displayFiles(audioFiles);
+        saveFilesToIndexedDB(audioFiles);
+      }
+
+      function displayFiles(files) {
+        fileList.innerHTML = "";
+        files.forEach((file) => {
+          const blobURL = URL.createObjectURL(file);
+          const listItem = document.createElement("li");
+          listItem.textContent = file.name;
+
+          const playBtn = document.createElement("button");
+          playBtn.textContent = "Play";
+          playBtn.addEventListener("click", () => playFile(blobURL));
+
+          listItem.appendChild(playBtn);
+          fileList.appendChild(listItem);
+        });
+      }
+
+      function playFile(blobURL) {
+        audioPlayer.src = blobURL;
+        audioPlayer.play();
+      }
+
+      function saveFilesToIndexedDB(files) {
+        const request = indexedDB.open("audioLibrary", 1);
+        request.onupgradeneeded = () => {
+          const db = request.result;
+          if (!db.objectStoreNames.contains("files")) {
+            db.createObjectStore("files", { keyPath: "name" });
+          }
+        };
+
+        request.onsuccess = () => {
+          const db = request.result;
+          const transaction = db.transaction("files", "readwrite");
+          const store = transaction.objectStore("files");
+
+          files.forEach((file) => {
+            const fileData = {
+              name: file.webkitRelativePath,
+              file,
+            };
+            store.put(fileData);
+          });
+        };
+      }
+
+      function loadFilesFromIndexedDB() {
+        const request = indexedDB.open("audioLibrary", 1);
+        request.onsuccess = () => {
+          const db = request.result;
+          const transaction = db.transaction("files", "readonly");
+          const store = transaction.objectStore("files");
+          const files = [];
+
+          store.openCursor().onsuccess = (e) => {
+            const cursor = e.target.result;
+            if (cursor) {
+              const fileData = cursor.value;
+              const blobURL = URL.createObjectURL(fileData.file);
+              const listItem = document.createElement("li");
+              listItem.textContent = fileData.name;
+
+              const playBtn = document.createElement("button");
+              playBtn.textContent = "Play";
+              playBtn.addEventListener("click", () => playFile(blobURL));
+
+              listItem.appendChild(playBtn);
+              fileList.appendChild(listItem);
+
+              cursor.continue();
+            }
+          };
+        };
+      }
+    </script>
+  </body>
+</html>

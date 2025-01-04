@@ -39,14 +39,14 @@ body {
   }
 }
 
-.upload-section {
+/* .upload-section {
   margin-bottom: 20px;
   padding: 20px;
   border: 2px dashed var(--input-border);
   border-radius: 10px;
   background-color: var(--input-background);
   color: var(--text-color);
-}
+}*/
 
 #urlInput {
   width: 100%;
@@ -68,6 +68,7 @@ body {
   color: white;
   border: none;
   cursor: pointer;
+  display: none;
   margin: 10px 0;
   transition: background-color 0.3s ease;
   border-radius: 10px;
@@ -88,30 +89,6 @@ body {
   display: none;
 }
 
-.song-list {
-  max-height: 300px;
-  overflow-y: auto;
-  margin: 20px 0;
-  background-color: var(--input-background);
-  border-radius: 10px;
-  padding: 10px;
-}
-
-.song-item {
-  padding: 10px;
-  cursor: pointer;
-  color: var(--text-color);
-  border-radius: 5px;
-  margin: 5px 0;
-  text-align: left;
-  transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-.song-item:hover {
-  background-color: var(--button-background);
-  color: white;
-}
-
 h1 {
   color: var(--text-color);
 }
@@ -123,6 +100,7 @@ h1 {
   justify-content: center;
   min-height: 100vh;
   padding: 20px;
+  margin-top: -10rem;
   box-sizing: border-box;
   transition: opacity 0.5s ease, visibility 0.5s ease;
   visibility: hidden;
@@ -132,4 +110,9 @@ h1 {
 .parent-container:hover .container {
   opacity: 1;
   visibility: visible;
+}
+
+audio::-webkit-media-controls-enclosure {
+  background-color: var(--audio-controls-bg);
+  border-radius: 10px;
 }

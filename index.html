@@ -13,20 +13,10 @@
   <body>
     <div class="parent-container">
       <div class="container">
-        <div class="upload-section">
-          <input
-            type="file"
-            id="folder-input"
-            webkitdirectory
-            directory
-            multiple
-          />
-          <p>Drop your music folder here or click to select</p>
-        </div>
-        <input type="text" id="urlInput" placeholder="Search songs..." />
-        <div id="songList" class="song-list"></div>
+        <input type="text" id="urlInput" placeholder="Enter audio file URL" />
+        <button id="playButton">Play</button>
         <div id="errorMessage"></div>
-        <audio id="audioPlayer" controls loop></audio>
+        <audio id="audioPlayer" controls loop autoplay></audio>
       </div>
     </div>
     <script type="module" src="./src/main.js"></script>
