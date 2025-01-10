@@ -8,15 +8,30 @@
       href="https://www.svgrepo.com/show/268463/music-player-music.svg"
       type="image/x-icon"
     />
-    <title>Player</title>
+    <title>Loop Player</title>
   </head>
   <body>
     <div class="parent-container">
       <div class="container">
-        <input type="text" id="urlInput" placeholder="Enter audio file URL" />
+        <div id="upload-zone">
+          Drop audio files or folder here or click to upload
+        </div>
+        <input
+          type="file"
+          id="file-input"
+          multiple
+          webkitdirectory
+          style="display: none"
+        />
+        <input
+          type="text"
+          id="urlInput"
+          placeholder="Enter audio file URL or search stored tracks"
+        />
         <button id="playButton">Play</button>
         <div id="errorMessage"></div>
-        <audio id="audioPlayer" controls loop autoplay></audio>
+        <ul id="file-list"></ul>
+        <audio id="audioPlayer" controls loop></audio>
       </div>
     </div>
     <script type="module" src="./src/main.js"></script>

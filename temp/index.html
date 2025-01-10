@@ -145,3 +145,171 @@
     </script>
   </body>
 </html>
+
+<!-- New code form claude which didn't work -->
+<!-- // Keep your existing HTML structure, only replace the script section with:
+
+const urlInput = document.getElementById("urlInput");
+const playButton = document.getElementById("playButton");
+const audioPlayer = document.getElementById("audioPlayer");
+const errorMessage = document.getElementById("errorMessage");
+const uploadZone = document.getElementById("upload-zone");
+const fileInput = document.getElementById("file-input");
+const fileList = document.getElementById("file-list");
+
+let db;
+let storedFiles = [];
+let selectedIndex = -1;
+const FADE_DURATION = 1000;
+const FADE_INTERVAL = 50;
+let fadeTimeout = null;
+
+// Load saved state
+const savedUrl = localStorage.getItem("audioUrl");
+const savedTime = localStorage.getItem("audioTime");
+
+// IndexedDB setup
+const request = indexedDB.open("audioLibrary", 1);
+
+request.onupgradeneeded = (event) => {
+  db = event.target.result;
+  if (!db.objectStoreNames.contains("files")) {
+    db.createObjectStore("files", { keyPath: "name" });
+  }
+};
+
+request.onsuccess = (event) => {
+  db = event.target.result;
+  loadFilesFromIndexedDB();
+
+  // Restore previous session state
+  if (savedUrl) {
+    urlInput.value = savedUrl;
+    audioPlayer.src = savedUrl;
+    audioPlayer.loop = true;
+    audioPlayer.addEventListener("loadedmetadata", () => {
+      if (savedTime) {
+        audioPlayer.currentTime = parseFloat(savedTime);
+      }
+    });
+  }
+};
+
+// Save playback time as the song plays
+audioPlayer.addEventListener("timeupdate", () => {
+  localStorage.setItem("audioTime", audioPlayer.currentTime);
+});
+
+// Fade functions
+function fadeOut(onComplete) {
+  const steps = FADE_DURATION / FADE_INTERVAL;
+  const volumeStep = audioPlayer.volume / steps;
+  const fade = () => {
+    if (audioPlayer.volume > volumeStep) {
+      audioPlayer.volume -= volumeStep;
+      fadeTimeout = setTimeout(fade, FADE_INTERVAL);
+    } else {
+      audioPlayer.volume = 0;
+      if (onComplete) onComplete();
+    }
+  };
+  fade();
+}
+
+function fadeIn() {
+  const targetVolume = 1.0;
+  const steps = FADE_DURATION / FADE_INTERVAL;
+  const volumeStep = targetVolume / steps;
+  const fade = () => {
+    if (audioPlayer.volume < targetVolume - volumeStep) {
+      audioPlayer.volume += volumeStep;
+      fadeTimeout = setTimeout(fade, FADE_INTERVAL);
+    } else {
+      audioPlayer.volume = targetVolume;
+    }
+  };
+  fade();
+}
+
+// File handling (keep your existing implementation)
+uploadZone.addEventListener("click", () => fileInput.click());
+uploadZone.addEventListener("dragover", (e) => e.preventDefault());
+uploadZone.addEventListener("drop", (e) => {
+  e.preventDefault();
+  handleFiles(e.dataTransfer.files);
+});
+fileInput.addEventListener("change", () => handleFiles(fileInput.files));
+
+// Keep your existing handleFiles, saveFilesToIndexedDB, loadFilesFromIndexedDB functions
+
+async function playAudio(url) {
+  if (fadeTimeout) {
+    clearTimeout(fadeTimeout);
+  }
+  if (!audioPlayer.paused) {
+    await new Promise((resolve) => {
+      fadeOut(() => {
+        audioPlayer.pause();
+        resolve();
+      });
+    });
+  }
+  audioPlayer.volume = 0;
+  audioPlayer.src = url;
+  audioPlayer.loop = true;
+  localStorage.setItem("audioUrl", url);
+
+  audioPlayer.addEventListener("loadedmetadata", () => {
+    audioPlayer.currentTime = 0;
+    audioPlayer.play()
+      .then(() => {
+        fadeIn();
+      })
+      .catch((error) => {
+        errorMessage.style.display = "block";
+        errorMessage.textContent = `Error playing audio: ${error.message}`;
+      });
+  });
+}
+
+// Enhanced keyboard controls
+document.addEventListener("keydown", (event) => {
+  if (event.key === "ArrowUp" && !event.altKey) {
+    // Volume Up
+    audioPlayer.volume = Math.min(audioPlayer.volume + 0.1, 1);
+  } else if (event.key === "ArrowDown" && !event.altKey) {
+    // Volume Down
+    audioPlayer.volume = Math.max(audioPlayer.volume - 0.1, 0);
+  } else if (event.key === "ArrowRight") {
+    // Seek Forward
+    audioPlayer.currentTime = Math.min(
+      audioPlayer.currentTime + 2.5,
+      audioPlayer.duration
+    );
+  } else if (event.key === "ArrowLeft") {
+    // Seek Backward
+    audioPlayer.currentTime = Math.max(audioPlayer.currentTime - 2.5, 0);
+  } else if (event.key === "ArrowUp" && event.altKey && fileList.style.display === "block") {
+    event.preventDefault();
+    selectedIndex = Math.max(0, selectedIndex - 1);
+    updateFileList(urlInput.value.toLowerCase());
+  } else if (event.key === "ArrowDown" && event.altKey && fileList.style.display === "block") {
+    event.preventDefault();
+    selectedIndex = Math.min(storedFiles.length - 1, selectedIndex + 1);
+    updateFileList(urlInput.value.toLowerCase());
+  } else if (event.key === "Enter" && document.activeElement === urlInput) {
+    event.preventDefault();
+    if (selectedIndex >= 0) {
+      const selectedFile = storedFiles[selectedIndex];
+      selectFile(selectedIndex, selectedFile);
+    } else {
+      const audioUrl = urlInput.value.trim();
+      if (audioUrl.startsWith("http")) {
+        playAudio(audioUrl);
+      }
+    }
+    urlInput.blur();
+  }
+});
+
+// Keep your existing event listeners for file list handling and URL input -->

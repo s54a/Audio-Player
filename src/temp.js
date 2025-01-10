@@ -1,3 +1,5 @@
+import "./style.css";
+
 const urlInput = document.getElementById("urlInput");
 const playButton = document.getElementById("playButton");
 const audioPlayer = document.getElementById("audioPlayer");
