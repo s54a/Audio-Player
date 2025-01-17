@@ -30,14 +30,14 @@ body {
   margin: 0 auto;
   padding: 20px;
   text-align: center;
-  background: var(--gradient-light);
+  background: var(--gradient-dark);
 }
 
-@media (prefers-color-scheme: dark) {
+/* @media (prefers-color-scheme: dark) {
   body {
     background: var(--gradient-dark);
   }
-}
+} */
 
 this was commented out .upload-section {
   margin-bottom: 20px;
