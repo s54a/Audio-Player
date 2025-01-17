@@ -4,9 +4,6 @@ const urlInput = document.getElementById("urlInput");
 const playButton = document.getElementById("playButton");
 const audioPlayer = document.getElementById("audioPlayer");
 const errorMessage = document.getElementById("errorMessage");
-const uploadZone = document.getElementById("upload-zone");
-const fileInput = document.getElementById("file-input");
-const fileList = document.getElementById("file-list");
 
 const savedUrl = localStorage.getItem("audioUrl");
 const savedTime = localStorage.getItem("audioTime");
@@ -34,110 +31,6 @@ window.addEventListener("DOMContentLoaded", () => {
 audioPlayer.addEventListener("timeupdate", () => {
   localStorage.setItem("audioTime", audioPlayer.currentTime);
 });
-
-let db;
-let storedFiles = [];
-let selectedIndex = -1;
-
-// IndexedDB setup
-const request = indexedDB.open("audioLibrary", 1);
-
-request.onupgradeneeded = (event) => {
-  db = event.target.result;
-  if (!db.objectStoreNames.contains("files")) {
-    db.createObjectStore("files", { keyPath: "name" });
-  }
-};
-
-request.onsuccess = (event) => {
-  db = event.target.result;
-  loadFilesFromIndexedDB();
-};
-
-// File handling
-uploadZone.addEventListener("click", () => fileInput.click());
-uploadZone.addEventListener("dragover", (e) => e.preventDefault());
-uploadZone.addEventListener("drop", (e) => {
-  e.preventDefault();
-  handleFiles(e.dataTransfer.files);
-});
-fileInput.addEventListener("change", () => handleFiles(fileInput.files));
-
-function handleFiles(files) {
-  const audioFiles = Array.from(files).filter(
-    (file) =>
-      file.type.includes("audio") || file.name.toLowerCase().endsWith(".mp3")
-  );
-  saveFilesToIndexedDB(audioFiles);
-}
-
-function saveFilesToIndexedDB(files) {
-  const transaction = db.transaction("files", "readwrite");
-  const store = transaction.objectStore("files");
-
-  files.forEach((file) => {
-    const fileData = {
-      name: file.name,
-      file: file,
-      path: file.webkitRelativePath || file.name,
-    };
-    store.put(fileData);
-  });
-
-  transaction.oncomplete = () => {
-    loadFilesFromIndexedDB();
-  };
-}
-
-function loadFilesFromIndexedDB() {
-  const transaction = db.transaction("files", "readonly");
-  const store = transaction.objectStore("files");
-  storedFiles = [];
-
-  store.openCursor().onsuccess = (e) => {
-    const cursor = e.target.result;
-    if (cursor) {
-      storedFiles.push(cursor.value);
-      cursor.continue();
-    } else {
-      updateFileList();
-    }
-  };
-}
-
-// Search and display functionality
-urlInput.addEventListener("input", () => {
-  const searchTerm = urlInput.value.toLowerCase();
-  updateFileList(searchTerm);
-});
-
-function updateFileList(searchTerm = "") {
-  fileList.innerHTML = "";
-  const filteredFiles = storedFiles.filter((file) =>
-    file.path.toLowerCase().includes(searchTerm)
-  );
-
-  if (filteredFiles.length > 0) {
-    fileList.style.display = "block";
-    filteredFiles.forEach((file, index) => {
-      const li = document.createElement("li");
-      li.textContent = file.path;
-      li.onclick = () => selectFile(index, file);
-      if (index === selectedIndex) li.classList.add("selected");
-      fileList.appendChild(li);
-    });
-  } else {
-    fileList.style.display = "none";
-  }
-}
-
-function selectFile(index, file) {
-  selectedIndex = index;
-  urlInput.value = file.path;
-  updateFileList();
-  const blobURL = URL.createObjectURL(file.file);
-  playAudio(blobURL);
-}
 
 function fadeOut(onComplete) {
   const steps = FADE_DURATION / FADE_INTERVAL;
@@ -199,7 +92,6 @@ async function playAudio(url) {
         fadeIn();
       })
       .catch((error) => {
-        errorMessage.style.display = "block";
         errorMessage.textContent = `Error playing audio: ${error.message}`;
       });
   });
@@ -216,31 +108,6 @@ playButton.addEventListener("click", () => {
   localStorage.setItem("audioUrl", audioUrl);
   // Call the playAudio function
   playAudio(audioUrl);
-});
-
-// Keyboard navigation
-document.addEventListener("keydown", (event) => {
-  if (event.key === "Enter" && document.activeElement === urlInput) {
-    event.preventDefault();
-    if (selectedIndex >= 0) {
-      const selectedFile = storedFiles[selectedIndex];
-      selectFile(selectedIndex, selectedFile);
-    } else {
-      const audioUrl = urlInput.value.trim();
-      if (audioUrl.startsWith("http")) {
-        playAudio(audioUrl);
-      }
-    }
-    urlInput.blur();
-  } else if (event.key === "ArrowUp" && fileList.style.display === "block") {
-    event.preventDefault();
-    selectedIndex = Math.max(0, selectedIndex - 1);
-    updateFileList(urlInput.value.toLowerCase());
-  } else if (event.key === "ArrowDown" && fileList.style.display === "block") {
-    event.preventDefault();
-    selectedIndex = Math.min(storedFiles.length - 1, selectedIndex + 1);
-    updateFileList(urlInput.value.toLowerCase());
-  }
 });
 
 // Input field event handlers
@@ -263,7 +130,7 @@ audioPlayer.addEventListener("error", (e) => {
     "Unable to load or play the audio file. Check the URL and file access.";
 });
 
-// Keyboard shortcuts
+// // Keyboard shortcuts
 document.addEventListener("keydown", (event) => {
   if (event.key === "/") {
     event.preventDefault();
@@ -272,7 +139,7 @@ document.addEventListener("keydown", (event) => {
   } else if (event.key === "Escape") {
     urlInput.blur();
     urlInput.value = savedUrl;
-  } else if (event.code === "Space" && document.activeElement !== urlInput) {
+  } else if (event.code === "Space") {
     event.preventDefault();
     if (audioPlayer.paused) {
       audioPlayer.volume = 0;
@@ -282,18 +149,19 @@ document.addEventListener("keydown", (event) => {
     }
   }
 });
-// document.addEventListener("paste", function (e) {
-//   // This will work when user manually pastes
-//   const text = e.clipboardData.getData("text");
-//   e.preventDefault();
-//   urlInput.focus();
-//   urlInput.value = "";
-//   urlInput.value = text;
-//   setTimeout(() => {
-//     playButton.click();
-//     urlInput.blur();
-//   }, 10);
-// });
+
+document.addEventListener("paste", function (e) {
+  // This will work when user manually pastes
+  const text = e.clipboardData.getData("text");
+  e.preventDefault();
+  urlInput.focus();
+  urlInput.value = "";
+  urlInput.value = text;
+  setTimeout(() => {
+    playButton.click();
+    urlInput.blur();
+  }, 10);
+});
 
 // const container = document.querySelector(".container");
 // let isContainerVisible = true;
@@ -320,17 +188,4 @@ document.addEventListener("keydown", (event) => {
   //   isContainerVisible = !isContainerVisible;
   //   container.style.visibility = isContainerVisible ? "visible" : "hidden";
   // }
-});
-
-// Hide file list when clicking outside
-document.addEventListener("click", (e) => {
-  if (!fileList.contains(e.target) && e.target !== urlInput) {
-    fileList.style.display = "none";
-  }
-});
-
-urlInput.addEventListener("focus", () => {
-  if (storedFiles.length > 0) {
-    updateFileList(urlInput.value.toLowerCase());
-  }
 });
