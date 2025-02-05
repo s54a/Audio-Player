@@ -8,16 +8,16 @@ importers:
 
   .:
     dependencies:
-      chokidar:
-        specifier: ^4.0.3
-        version: 4.0.3
+      vite:
+        specifier: ^6.0.5
+        version: 6.0.5
       vite-plugin-singlefile:
         specifier: ^2.1.0
         version: 2.1.0(rollup@4.29.1)(vite@6.0.5)
     devDependencies:
-      vite:
-        specifier: ^6.0.5
-        version: 6.0.5
+      chokidar:
+        specifier: ^4.0.3
+        version: 4.0.3
 
 packages:
 
